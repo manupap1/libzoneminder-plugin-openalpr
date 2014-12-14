@@ -12,3 +12,17 @@ Makefile.in
 /install-sh
 /missing
 /stamp-h1
+
+config.guess
+config.h.in
+config.log
+config.sub
+
+# Libtool files
+
+ltmain.sh
+m4/
+
+# Distro related content
+
+debian
