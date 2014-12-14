@@ -6,13 +6,13 @@ Bugs: mailto:manupap01@gmail.com
 Homepage: https://github.com/manupap1/libzm-openalpr-plugin
 Standards-Version: 3.9.6
 Build-Conflicts: libjpeg8-dev
-Build-Depends: debhelper (>= 9), quilt, dh-autoreconf, libopenalpr-dev,
- zoneminder (>= 1.28.0), libboost-program-options1.55-dev, libopencv-dev,
+Build-Depends: debhelper (>= 9), quilt, dh-autoreconf, openalpr,
+ zoneminder-dev (>= 1.28.1), libboost-program-options1.55-dev, libopencv-dev,
  libopencv-core-dev, libopencv-imgproc-dev,
 
 Package: libzm-plugin-openalpr
 Architecture: amd64
-Depends: ${shlibs:Depends}, ${misc:Depends}, zoneminder (>= 1.28.0),
+Depends: ${shlibs:Depends}, ${misc:Depends}, zoneminder (>= 1.28.1),
 Description: License Plate Recognition plugin with openalpr library
  This plugin add support for recognition of license plate number to zoneminder
  with the use of the OpenALPR library
