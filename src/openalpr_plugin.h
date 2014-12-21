@@ -25,6 +25,8 @@
 #include <fstream>
 #include <algorithm>
 
+#include <alpr.h>
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -34,9 +36,9 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/errors.hpp>
 
-#include "zm_plugin_manager.h"
-#include "zm_detector.h"
-#include "zm_rgb.h"
+#include <zoneminder/zm_plugin_manager.h>
+#include <zoneminder/zm_detector.h>
+#include <zoneminder/zm_rgb.h>
 
 #define ALPR_NULL_PTR 0
 
@@ -56,6 +58,7 @@
 #define LOG_PREFIX "OPENALPR PLUGIN"
 
 using namespace std;
+using namespace alpr;
 using namespace boost::program_options;
 
 //! OpenALPR plugin class.

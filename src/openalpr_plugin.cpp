@@ -18,7 +18,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <alpr.h>
 #include "openalpr_plugin.h"
 
 //! Retrieve the engine version we're going to expect
