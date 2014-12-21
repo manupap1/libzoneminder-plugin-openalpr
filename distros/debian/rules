@@ -43,7 +43,7 @@ TARBALL = ../$(PKG)_$(VER)$(DTYPE).orig.tar.xz
 
 .PHONY: override_dh_strip
 override_dh_strip:
-	dh_strip --dbg-package=libzm-plugin-openalpr-dbg
+	dh_strip --dbg-package=libzoneminder-plugin-openalpr-dbg
 
 # Inspired by https://wiki.debian.org/onlyjob/get-orig-source
 .PHONY: get-orig-source

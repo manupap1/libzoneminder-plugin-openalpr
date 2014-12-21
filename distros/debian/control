@@ -12,8 +12,20 @@ Build-Depends: debhelper (>= 9), quilt, dh-autoreconf,
  libopencv-imgproc-dev
 
 Package: libzoneminder-plugin-openalpr
-Architecture: amd64
-Depends: ${shlibs:Depends}, ${misc:Depends}, zoneminder-core (>= 1.28.1),
-Description: License Plate Recognition plugin with openalpr library
- This plugin add support for recognition of license plate number to zoneminder
- with the use of the OpenALPR library
+Architecture: any
+Depends: zoneminder-core (>= 1.28.1), ${shlibs:Depends}, ${misc:Depends}
+Description: OpenALPR plugin for ZoneMinder (License Plate Recognition)
+ ZoneMinder is a video camera security and surveillance solution.
+ .
+ This package provides a plugin based on OpenALPR library to support License
+ Plate Recognition in ZoneMinder.
+
+Package: libzoneminder-plugin-openalpr-dbg
+Priority: extra
+Section: debug
+Architecture: any
+Depends: libzoneminder-plugin-openalpr (= ${binary:Version}), ${misc:Depends}
+Description: Debugging symbols for ZoneMinder's OpenALPR plugin
+ ZoneMinder is a video camera security and surveillance solution.
+ .
+ This package provides the debugging symbols the OpenALPR plugin.
