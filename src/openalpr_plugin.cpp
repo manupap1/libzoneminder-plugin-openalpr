@@ -194,7 +194,6 @@ OpenALPRPlugin & OpenALPRPlugin:: operator=(const OpenALPRPlugin& source)
  */
 bool OpenALPRPlugin::checkZone(Zone *zone, unsigned int n_zone, const Image *zmImage)
 {
-Info("OpenALPRPlugin::checkZone()");
     double score;
     string sOutput;
     Polygon zone_polygon = Polygon(zone->GetPolygon()); // Polygon of interest of the processed zone.
