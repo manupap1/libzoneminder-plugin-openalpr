@@ -246,7 +246,7 @@ bool OpenALPRPlugin::checkZone(Zone *zone, unsigned int n_zone, const Image *zmI
         // otherwise process next object
         if (nNumVertInside < 3)
             continue;
-Info("Plate detected!");
+
         int cntDetInArea = 0;
         time_t now = time(0);
 
