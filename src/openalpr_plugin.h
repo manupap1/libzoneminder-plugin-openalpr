@@ -48,8 +48,7 @@
 #define DEFAULT_MAX_PLATE_NUMBER 10
 #define DEFAULT_REGION_IS_DETECTED 0
 #define DEFAULT_MIN_CONFIDENCE 0
-#define DEFAULT_TOP_CONF_IS_DET 0
-#define DEFAULT_SKIP_NEXT_LOWER_CONF 0
+#define DEFAULT_ADAPTIVE_CONF 0
 #define DEFAULT_MIN_CHARACTERS 0
 #define DEFAULT_MAX_CHARACTERS 99
 #define DEFAULT_MAX_EXCL_PERIOD 0
@@ -103,14 +102,14 @@ private:
     struct pConf
     {
         unsigned int minConfidence;
-        bool skipNextLowerConf;
+        bool adaptiveConf;
         unsigned int minCharacters;
         unsigned int maxCharacters;
         unsigned int maxExclPeriod;
         unsigned int alarmScore;
         pConf():
             minConfidence(DEFAULT_MIN_CONFIDENCE),
-            skipNextLowerConf(DEFAULT_SKIP_NEXT_LOWER_CONF),
+            adaptiveConf(DEFAULT_ADAPTIVE_CONF),
             minCharacters(DEFAULT_MIN_CHARACTERS),
             maxCharacters(DEFAULT_MAX_CHARACTERS),
             maxExclPeriod(DEFAULT_MAX_EXCL_PERIOD),

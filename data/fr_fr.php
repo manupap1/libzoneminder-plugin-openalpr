@@ -22,7 +22,7 @@
 
 $PLANG = array(
         'MinConfidence'         => 'Confiance minimum',
-        'SkipNextLowerConf'     => 'Sauter si confiance moindre',
+        'AdaptiveConf'          => 'Confiance adaptive',
         'MinCharacters'         => 'Nombre minimum de caractères',
         'MaxCharacters'         => 'Nombre maximum de caractères',
         'MaxExclPeriod'         => 'Durée maximum d\'exclusion',

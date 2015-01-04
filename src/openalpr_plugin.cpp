@@ -119,8 +119,8 @@ int OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<stri
             if (it2->second.empty()) continue;
             if (it2->first == "MinConfidence") {
                 pluginConfig[it->first].minConfidence = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
-            } else if (it2->first == "SkipNextLowerConf") {
-                pluginConfig[it->first].skipNextLowerConf = (it2->second == "yes");
+            } else if (it2->first == "AdaptiveConf") {
+                pluginConfig[it->first].adaptiveConf = (it2->second == "yes");
             } else if (it2->first == "MinCharacters") {
                 pluginConfig[it->first].minCharacters = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
             } else if (it2->first == "MaxCharacters") {
@@ -270,7 +270,7 @@ bool OpenALPRPlugin::checkZone(Zone *zone, unsigned int n_zone, const Image *zmI
                 continue;
 
             // Set confidence level
-            if (pluginConfig[n_zone].skipNextLowerConf) {
+            if (pluginConfig[n_zone].adaptiveConf) {
                 if (topConfidence < results.plates[i].topNPlates[k].overall_confidence)
                 {
                     topConfidence = results.plates[i].topNPlates[k].overall_confidence;
