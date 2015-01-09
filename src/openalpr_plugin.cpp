@@ -41,7 +41,7 @@ OpenALPRPlugin::OpenALPRPlugin()
     m_bRegionIsDet(DEFAULT_DETECT_REGION)
 {
     m_sDetectionCause = DEFAULT_DETECTION_CAUSE;
-    m_sLogPrefix = DEFAULT_LOG_PREFIX;
+    m_sLogPrefix = DEFAULT_PLUGIN_LOG_PREFIX;
 
     Info("OpenALPR plugin object has been created.");
 }
@@ -55,7 +55,7 @@ OpenALPRPlugin::OpenALPRPlugin(string sPluginName)
     m_bRegionIsDet(DEFAULT_DETECT_REGION)
 {
     m_sDetectionCause = DEFAULT_DETECTION_CAUSE;
-    m_sLogPrefix = DEFAULT_LOG_PREFIX;
+    m_sLogPrefix = DEFAULT_PLUGIN_LOG_PREFIX;
 
     Info("OpenALPR plugin object has been created,");
 }
@@ -84,7 +84,7 @@ int OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<stri
             ((m_sConfigSectionName + string(".det_cause")).c_str(),
                 value<string>()->default_value(DEFAULT_DET_CAUSE))
             ((m_sConfigSectionName + string(".log_prefix")).c_str(),
-                value<string>()->default_value(DEFAULT_LOG_PREFIX));
+                value<string>()->default_value(DEFAULT_PLUGIN_LOG_PREFIX));
         try
         {
             ifstream ifs(sConfigFileName.c_str());
