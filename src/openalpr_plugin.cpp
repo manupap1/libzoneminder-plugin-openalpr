@@ -34,28 +34,28 @@ extern "C" void registerPlugin(PluginManager &PlM, string sPluginName)
 
 OpenALPRPlugin::OpenALPRPlugin()
   : Detector(),
-    m_sConfigFilePath(DEFAULT_OPENALPR_CONFIG_FILE_PATH),
-    m_sCountry(DEFAULT_COUNTRY),
-    m_sRegionTemplate(DEFAULT_REGION_TEMPLATE),
-    m_nMaxPlateNumber(DEFAULT_MAX_PLATE_NUMBER),
-    m_bRegionIsDet(DEFAULT_REGION_IS_DETECTED)
+    m_sConfigFilePath(DEFAULT_CONFIG_FILE),
+    m_sCountry(DEFAULT_COUNTRY_CODE),
+    m_sRegionTemplate(DEFAULT_TEMPLATE_REGION),
+    m_nMaxPlateNumber(DEFAULT_TOPN),
+    m_bRegionIsDet(DEFAULT_DETECT_REGION)
 {
-    m_sDetectionCause = DETECTED_CAUSE;
-    m_sLogPrefix = LOG_PREFIX;
+    m_sDetectionCause = DEFAULT_DETECTION_CAUSE;
+    m_sLogPrefix = DEFAULT_LOG_PREFIX;
 
     Info("OpenALPR plugin object has been created.");
 }
 
 OpenALPRPlugin::OpenALPRPlugin(string sPluginName)
   : Detector(sPluginName),
-    m_sConfigFilePath(DEFAULT_OPENALPR_CONFIG_FILE_PATH),
-    m_sCountry(DEFAULT_COUNTRY),
-    m_sRegionTemplate(DEFAULT_REGION_TEMPLATE),
-    m_nMaxPlateNumber(DEFAULT_MAX_PLATE_NUMBER),
-    m_bRegionIsDet(DEFAULT_REGION_IS_DETECTED)
+    m_sConfigFilePath(DEFAULT_CONFIG_FILE),
+    m_sCountry(DEFAULT_COUNTRY_CODE),
+    m_sRegionTemplate(DEFAULT_TEMPLATE_REGION),
+    m_nMaxPlateNumber(DEFAULT_TOPN),
+    m_bRegionIsDet(DEFAULT_DETECT_REGION)
 {
-    m_sDetectionCause = DETECTED_CAUSE;
-    m_sLogPrefix = LOG_PREFIX;
+    m_sDetectionCause = DEFAULT_DETECTION_CAUSE;
+    m_sLogPrefix = DEFAULT_LOG_PREFIX;
 
     Info("OpenALPR plugin object has been created,");
 }
@@ -71,20 +71,20 @@ int OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<stri
         options_description config_file("Configuration file options.");
         variables_map vm;
         config_file.add_options()
-            ((m_sConfigSectionName + string(".config-file")).c_str(),
-                value<string>()->default_value(DEFAULT_OPENALPR_CONFIG_FILE_PATH))
-            ((m_sConfigSectionName + string(".country")).c_str(),
-                value<string>()->default_value(DEFAULT_COUNTRY))
-            ((m_sConfigSectionName + string(".region-template")).c_str(),
-                value<string>()->default_value(DEFAULT_REGION_TEMPLATE))
-            ((m_sConfigSectionName + string(".max-plate-number")).c_str(),
-                value<int>()->default_value(DEFAULT_MAX_PLATE_NUMBER))
-            ((m_sConfigSectionName + string(".region-is-det")).c_str(),
-                value<bool>()->default_value(DEFAULT_REGION_IS_DETECTED))
-            ((m_sConfigSectionName + string(".det-cause")).c_str(),
-                value<string>()->default_value(DETECTED_CAUSE))
-            ((m_sConfigSectionName + string(".log-prefix")).c_str(),
-                value<string>()->default_value(LOG_PREFIX));
+            ((m_sConfigSectionName + string(".config_file")).c_str(),
+                value<string>()->default_value(DEFAULT_CONFIG_FILE))
+            ((m_sConfigSectionName + string(".country_code")).c_str(),
+                value<string>()->default_value(DEFAULT_COUNTRY_CODE))
+            ((m_sConfigSectionName + string(".template_region")).c_str(),
+                value<string>()->default_value(DEFAULT_TEMPLATE_REGION))
+            ((m_sConfigSectionName + string(".topn")).c_str(),
+                value<int>()->default_value(DEFAULT_TOPN))
+            ((m_sConfigSectionName + string(".detect_region")).c_str(),
+                value<bool>()->default_value(DEFAULT_DETECT_REGION))
+            ((m_sConfigSectionName + string(".det_cause")).c_str(),
+                value<string>()->default_value(DEFAULT_DET_CAUSE))
+            ((m_sConfigSectionName + string(".log_prefix")).c_str(),
+                value<string>()->default_value(DEFAULT_LOG_PREFIX));
         try
         {
             ifstream ifs(sConfigFileName.c_str());
@@ -96,13 +96,13 @@ int OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<stri
             Error("Plugin is not configured (%s)", er.what());
             return 0;
         }
-        m_sConfigFilePath = vm[(m_sConfigSectionName + string(".config-file")).c_str()].as<string>();
-        m_sCountry = vm[(m_sConfigSectionName + string(".country")).c_str()].as<string>();
-        m_sRegionTemplate = vm[(m_sConfigSectionName + string(".region-template")).c_str()].as<string>();
-        m_nMaxPlateNumber = vm[(m_sConfigSectionName + string(".max-plate-number")).c_str()].as<int>();
-        m_bRegionIsDet = vm[(m_sConfigSectionName + string(".region-is-det")).c_str()].as<bool>();
-        m_sDetectionCause = vm[(m_sConfigSectionName + string(".det-cause")).c_str()].as<string>();
-        m_sLogPrefix = vm[(m_sConfigSectionName + string(".log-prefix")).c_str()].as<string>();
+        m_sConfigFilePath = vm[(m_sConfigSectionName + string(".config_file")).c_str()].as<string>();
+        m_sCountry = vm[(m_sConfigSectionName + string(".country_code")).c_str()].as<string>();
+        m_sRegionTemplate = vm[(m_sConfigSectionName + string(".template_region")).c_str()].as<string>();
+        m_nMaxPlateNumber = vm[(m_sConfigSectionName + string(".topn")).c_str()].as<int>();
+        m_bRegionIsDet = vm[(m_sConfigSectionName + string(".detect_region")).c_str()].as<bool>();
+        m_sDetectionCause = vm[(m_sConfigSectionName + string(".det_cause")).c_str()].as<string>();
+        m_sLogPrefix = vm[(m_sConfigSectionName + string(".log_prefix")).c_str()].as<string>();
     }
     catch(exception& ex)
     {

@@ -40,21 +40,20 @@
 #include <zoneminder/zm_detector.h>
 #include <zoneminder/zm_rgb.h>
 
-#define ALPR_NULL_PTR 0
+#define DEFAULT_CONFIG_FILE "/etc/openalpr/openalpr.conf"
+#define DEFAULT_COUNTRY_CODE "us"
+#define DEFAULT_TEMPLATE_REGION ""
+#define DEFAULT_TOPN 10
+#define DEFAULT_DETECT_REGION 0
+#define DEFAULT_DET_CAUSE "Plate Detected"
+#define DEFAULT_LOG_PREFIX "OPENALPR PLUGIN"
 
-#define DEFAULT_OPENALPR_CONFIG_FILE_PATH "/etc/openalpr/openalpr.conf"
-#define DEFAULT_COUNTRY "us"
-#define DEFAULT_REGION_TEMPLATE ""
-#define DEFAULT_MAX_PLATE_NUMBER 10
-#define DEFAULT_REGION_IS_DETECTED 0
+#define DEFAULT_ALARM_SCORE 99
 #define DEFAULT_MIN_CONFIDENCE 0
 #define DEFAULT_ADAPTIVE_CONF 0
 #define DEFAULT_MIN_CHARACTERS 0
 #define DEFAULT_MAX_CHARACTERS 99
 #define DEFAULT_MAX_EXCL_PERIOD 0
-#define DEFAULT_ALARM_SCORE 99
-#define DETECTED_CAUSE "Plate Detected"
-#define LOG_PREFIX "OPENALPR PLUGIN"
 
 using namespace std;
 using namespace alpr;
