@@ -1,15 +1,15 @@
-libzm-plugin-openalpr
+libzoneminder-plugin-openalpr
 =====================
 
 ## Overview
 
-libzm-plugin-openalpr is a free, open source Licence Plate Recognition plugin for the ZoneMinder CCTV sofware (https://github.com/ZoneMinder/ZoneMinder).
+libzoneminder-plugin-openalpr is a free, open source Licence Plate Recognition plugin for the ZoneMinder CCTV sofware (https://github.com/ZoneMinder/ZoneMinder).
 It is based on openalpr library (https://github.com/openalpr/openalpr).
 The recognized license plates are added to Zoneminder's event notes.
 
 ## Requirements
 
-libzm-plugin-openalpr requires:
+libzoneminder-plugin-openalpr requires:
 - A ZoneMinder installation with the plugin framework
 - The OpenALPR library
 
@@ -54,16 +54,16 @@ Installation of OpenALPR development library
 cd ..
 sudo dpkg -i libopenalpr-dev_2.0.0-0.2_amd64.deb libopenalpr2_2.0.0-0.2_amd64.deb libopenalpr-data_2.0.0-0.2_all.deb
 ```
-Compilation of libzm-plugin-openalpr
+Compilation of libzoneminder-plugin-openalpr
 ```bash
-git clone https://github.com/manupap1/libzm-plugin-openalpr.git
-cd libzm-plugin-openalpr
+git clone https://github.com/manupap1/libzoneminder-plugin-openalpr.git
+cd libzoneminder-plugin-openalpr
 cp -R distros/debian ./
 fakeroot debian/rules get-orig-source
 sudo apt-get install debhelper quilt dh-autoreconf pkg-config libboost-program-options1.55-dev libopencv-dev libopencv-core-dev libopencv-imgproc-dev
 debuild
 ```
-Installation of ZoneMinder, OpenALPR and libzm-plugin-openalpr
+Installation of ZoneMinder, OpenALPR and libzoneminder-plugin-openalpr
 ```bash
 cd ..
 sudo apt-get install libavcodec56 libavdevice55 libavformat56 libavutil54 libbz2-1.0 libc6 libcurl3 libgcc1 libgcrypt20 libgnutls-deb0-28 libgnutls-openssl27 libjpeg62-turbo libmysqlclient18 libpcre3 libstdc++6 libswscale3 libvlc5 zlib1g debconf init-system-helpers perl libdevice-serialport-perl libimage-info-perl libjson-any-perl libsys-mmap-perl liburi-encode-perl libwww-perl libarchive-tar-perl libarchive-zip-perl libdate-manip-perl libdbi-perl libmodule-load-conditional-perl libmime-lite-perl libmime-tools-perl libnet-sftp-foreign-perl libphp-serialization-perl libav-tools rsyslog netpbm zip policykit-1 apache2 libapache2-mod-php5 php5 php5-mysql mysql-server
@@ -77,7 +77,7 @@ Most of default values can be kept, but if you live in Europe, you can set the `
 
 All the next configuration steps are done through the web interface.
 
-Firstly, the plugin loading has to be enabled in ZM options (please check the `LOAD_PLUGIN` setting in `config` tab).
+Firstly, the plugin loading has to be enabled in ZM options (please check the `LOAD_PLUGIN` setting in `Config` tab).
 
 Then, you can configure the plugin settings from each `Zone` configuration page.
 
@@ -86,7 +86,7 @@ Then, you can configure the plugin settings from each `Zone` configuration page.
 Available plugins are listed with a color code under the `Plugins` row:
 - `Default color` - Plugin is not enabled for the zone
 - `Green` - Plugin is enabled for the zone
-- `Grey` - Plugin loading is disabled (please check `LOAD_PLUGIN` setting in `config` tab)
+- `Grey` - Plugin loading is disabled (please check `LOAD_PLUGIN` setting in `Config` tab)
 - `Orange` - Plugin is enabled for the zone but not active (configuration setting mismatch)
 - `Red` - ZoneMinder failed to load the plugin object (software error)
 
@@ -94,9 +94,9 @@ Once a plugin object is loaded, the `Plugin` configuration page is accessed by c
 
 The first options are available for all plugins:
 - `Enabled` - A yes/no select box to enable or disable the plugin
-- `Require Native Detection` - A yes/no select box to specify if native detection is required before to process plugin analysis. This option allow to limit CPU usage by using the plugin for post processing after native detection. This option is recommended for libzm-plugin-openalpr as the plugin may use a lot of CPU ressources
+- `Require Native Detection` - A yes/no select box to specify if native detection is required before to process plugin analysis. This option allow to limit CPU usage by using the plugin for post processing after native detection. This option is recommended for this plugin as it may use a lot of CPU ressources
 - `Include Native Detection` - A yes/no select box to specify if native detection shall be included in alarm score and image overlay
-- `Reinit. Native Detection` - A yes/no select box to specify if native detection shall be reinitialized after detection. ZoneMinder's native detection is performed by comparing the current image to a reference image. By design, the reference image is assigned when analysis is activated, and this image is not periodically refreshed. This operating method is not necessarily optimal because some plugins may require native detection only when motion is truly detected (current image different from the previous image). This option is recommended for libzm-plugin-openalpr. For example, without this option enabled, if a vehicle appears and parks in the camera field of view, the native detection will be be triggered as long as the vehicle is parked, and therefore the plugin analysis would be performed for an unnecessary period of time. With this option enabled, the plugin analysis stops when the vehicle stops.
+- `Reinit. Native Detection` - A yes/no select box to specify if native detection shall be reinitialized after detection. ZoneMinder's native detection is performed by comparing the current image to a reference image. By design, the reference image is assigned when analysis is activated, and this image is not periodically refreshed. This operating method is not necessarily optimal because some plugins may require native detection only when motion is truly detected (current image different from the previous image). This option is recommended for libzoneminder-plugin-openalpr. For example, without this option enabled, if a vehicle appears and parks in the camera field of view, the native detection will be be triggered as long as the vehicle is parked, and therefore the plugin analysis would be performed for an unnecessary period of time. With this option enabled, the plugin analysis stops when the vehicle stops.
 - `Alarme Score` - A text box to enter the score provided by the plugin in case of license plate detection
 
 The next options are specifics to this plugin and can be used to adjust the detection accuracy:
