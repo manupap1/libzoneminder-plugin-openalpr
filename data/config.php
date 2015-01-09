@@ -28,9 +28,9 @@ $pluginOptions = array(
         'Max' => '100',
         'Value' => '0'
     ),
-    'SkipNextLowerConf' => array(
+    'AdaptiveConf' => array(
         'Type' => 'select',
-        'Name' => 'SkipNextLowerConf',
+        'Name' => 'AdaptiveConf',
         'Choices' => 'Yes,No',
         'Value'=> 'No'
     ),
