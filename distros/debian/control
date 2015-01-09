@@ -1,4 +1,4 @@
-Source: libzm-plugin-openalpr
+Source: libzoneminder-plugin-openalpr
 Section: video
 Priority: optional
 Maintainer: Emmanuel Papin <manupap01@gmail.com>
