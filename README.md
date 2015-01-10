@@ -99,7 +99,7 @@ The first options are available for all plugins:
 - `Require Native Detection` - A yes/no select box to specify if native detection is required before to process plugin analysis. This option allow to limit CPU usage by using the plugin for post processing after native detection. This option is recommended for this plugin as it may use a lot of CPU ressources
 - `Include Native Detection` - A yes/no select box to specify if native detection shall be included in alarm score and image overlay
 - `Reinit. Native Detection` - A yes/no select box to specify if native detection shall be reinitialized after detection. ZoneMinder's native detection is performed by comparing the current image to a reference image. By design, the reference image is assigned when analysis is activated, and this image is not periodically refreshed. This operating method is not necessarily optimal because some plugins may require native detection only when motion is truly detected (current image different from the previous image). This option is recommended for libzoneminder-plugin-openalpr. For example, without this option enabled, if a vehicle appears and parks in the camera field of view, the native detection will be be triggered as long as the vehicle is parked, and therefore the plugin analysis would be performed for an unnecessary period of time. With this option enabled, the plugin analysis stops when the vehicle stops.
-- `Alarm Score` - A text box to enter the score provided by the plugin in case of license plate detection
+- `Alarm Score` - A text box to enter the score provided by the plugin in case of detection
 
 The next options are specifics to this plugin and can be used to adjust the detection accuracy:
 - `Minimum Confidence` - A text box to enter the minimum confidence level. All plates with a lower confidence level will be excluded.
@@ -113,7 +113,7 @@ The configuration is saved to the database and applied when clicking on the `Sav
 ### Using
 
 When a license plate is detected, this triggers an event with alarmed frame(s).
-Depending on your configuration settings and video content, an event can contain multiple alarmed frames.
+Depending on your configuration settings and video content, an event may contain multiple alarmed frames.
 
 ![Events](https://github.com/manupap1/libzoneminder-plugin-openalpr/blob/master/misc/events.png)
 
@@ -128,7 +128,7 @@ Alarmed frames are highlighted with the plate's detection area(s).
 ### Improvement / Contribution
 
 Feel free to contribute, if you can:
-- Address an issue (https://github.com/manupap1/libzoneminder-plugin-openalpr/issues),
+- Report or fix an issue (https://github.com/manupap1/libzoneminder-plugin-openalpr/issues),
 - Add a feature,
 - Or just correct any grammar mistakes I have committed...
 
