@@ -133,7 +133,7 @@ Feel free to contribute, if you can:
 - Or just correct any grammar mistakes I have committed...
 
 I am personally not in a position to provide videos content to test the plugin in all conditions.
-After some search to find footage with good quality and with optical settings adapted for LPR, I found this video on youtube: https://www.youtube.com/watch?v=ECIxQblzNWI
+After some search to find footage with good quality and with optical settings adapted for LPR, I found this video on youtube: https://www.youtube.com/watch?v=ECIxQblzNWI.
 The video has been published by iFacility Group (http://www.ifacility.co.uk) and is currently included in the misc folder.
 
 Any new video content is welcomed, if it meets the following criterias:
