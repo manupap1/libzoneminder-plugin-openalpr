@@ -127,7 +127,7 @@ int OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<stri
                 pluginConfig[it->first].maxCharacters = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
             } else if (it2->first == "MaxExclPeriod") {
                 pluginConfig[it->first].maxExclPeriod = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
-            } else if (it2->first == "AlarmeScore") {
+            } else if (it2->first == "AlarmScore") {
                 pluginConfig[it->first].alarmScore = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
             }
         }
