@@ -57,7 +57,7 @@ OpenALPRPlugin::OpenALPRPlugin(string sPluginName)
     m_sDetectionCause = DEFAULT_DETECTION_CAUSE;
     m_sLogPrefix = DEFAULT_PLUGIN_LOG_PREFIX;
 
-    Info("OpenALPR plugin object has been created,");
+    Info("OpenALPR plugin object has been created.");
 }
 
 /*! \fn OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<string,string> > mapPluginConf)
