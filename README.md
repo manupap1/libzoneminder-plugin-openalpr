@@ -81,7 +81,7 @@ Firstly, the plugin loading has to be enabled in ZM options (please check the `L
 
 Then, you can configure the plugin settings from each `Zone` configuration page.
 
-->![Zone](https://github.com/manupap1/libzoneminder-plugin-openalpr/blob/master/misc/zone.png)<-
+![Zone](https://github.com/manupap1/libzoneminder-plugin-openalpr/blob/master/misc/zone.png)
 
 Available plugins are listed with a color code under the `Plugins` row:
 - `Default color` - Plugin is not enabled for the zone
@@ -92,7 +92,7 @@ Available plugins are listed with a color code under the `Plugins` row:
 
 Once a plugin object is loaded, the `Plugin` configuration page is accessed by clicking on the plugin name.
 
-->![Plugin](https://github.com/manupap1/libzoneminder-plugin-openalpr/blob/master/misc/plugin.png)<-
+![Plugin](https://github.com/manupap1/libzoneminder-plugin-openalpr/blob/master/misc/plugin.png)
 
 The first options are available for all plugins:
 - `Enabled` - A yes/no select box to enable or disable the plugin
@@ -112,18 +112,18 @@ The configuration is saved to the database and applied when clicking on the `Sav
 
 ### Using
 
-When a license plate is detected, this triggers an event with alarmed image(s).
-Depending on your configuration settings and video content, an event can contain multiple alarmed images.
+When a license plate is detected, this triggers an event with alarmed frame(s).
+Depending on your configuration settings and video content, an event can contain multiple alarmed frames.
 
-->![Events](https://github.com/manupap1/libzoneminder-plugin-openalpr/blob/master/misc/events.png)<-
+![Events](https://github.com/manupap1/libzoneminder-plugin-openalpr/blob/master/misc/events.png)
 
 Licenses plates are stored in the event note field accessible by a click on the event detection cause.
 
-->![Event](https://github.com/manupap1/libzoneminder-plugin-openalpr/blob/master/misc/event.png)<-
+![Event](https://github.com/manupap1/libzoneminder-plugin-openalpr/blob/master/misc/event.png)
 
-Alarmed images are highlighted with the plate's detection area(s).
+Alarmed frames are highlighted with the plate's detection area(s).
 
-->![Image](https://github.com/manupap1/libzoneminder-plugin-openalpr/blob/master/misc/image.png)<-
+![Frame](https://github.com/manupap1/libzoneminder-plugin-openalpr/blob/master/misc/image.png)
 
 ### Improvement / Contribution
 
