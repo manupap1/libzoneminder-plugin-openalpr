@@ -87,7 +87,7 @@ protected:
 
     void onCreateEvent(Zone *zone, unsigned int n_zone, Event *event);
     void onCloseEvent(Zone *zone, unsigned int n_zone, Event *event);
-    bool checkZone(Zone *zone, unsigned int n_zone, Event *event);
+    bool checkZone(Zone *zone, unsigned int n_zone, const Image *zmImage);
 
     bool plateIsExcluded(string plateName);
     void addPlate(string plateNum, float confidence);
