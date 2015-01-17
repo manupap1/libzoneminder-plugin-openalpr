@@ -362,7 +362,7 @@ bool OpenALPRPlugin::plateIsExcluded(string plateName)
     return false;
 }
 
-bool OpenALPRPlugin::addPlate(string plateNum, float confidence)
+void OpenALPRPlugin::addPlate(string plateNum, float confidence)
 {
     Info("OpenALPRPlugin::addPlate");
     for(vector<strPlate>::iterator it = plateList.begin(); it != plateList.end(); ++it)
