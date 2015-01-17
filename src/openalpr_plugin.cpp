@@ -187,6 +187,16 @@ OpenALPRPlugin & OpenALPRPlugin:: operator=(const OpenALPRPlugin& source)
     return *this;
 }
 
+void OpenALPRPlugin::onCreateEvent(Zone *zone, unsigned int n_zone, Event *event)
+{
+    Info("OpenALPRPlugin::onCreateEvent");
+}
+
+void OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event)
+{
+    Info("OpenALPRPlugin::onCloseEvent");
+}
+
 /*! \fn OpenALPRPlugin::checkZone(Zone *zone, const Image *zmImage)
  *  \param zone is a zone where license plates will be detected
  *  \param zmImage is an image to perform license plate detection (in the form of ZM' Image)
@@ -266,11 +276,11 @@ bool OpenALPRPlugin::checkZone(Zone *zone, unsigned int n_zone, const Image *zmI
                 continue;
 
             // Disqualify plate if already in exclusion period
-            if (plateIsExcluded(results.plates[i].topNPlates[k].characters))
-                continue;
-
+/*            if (plateIsExcluded(results.plates[i].topNPlates[k].characters))
+            continue;
+*/
             // Set confidence level
-            if (pluginConfig[n_zone].adaptiveConf) {
+/*            if (pluginConfig[n_zone].adaptiveConf) {
                 if (topConfidence < results.plates[i].topNPlates[k].overall_confidence)
                 {
                     topConfidence = results.plates[i].topNPlates[k].overall_confidence;
@@ -298,6 +308,8 @@ bool OpenALPRPlugin::checkZone(Zone *zone, unsigned int n_zone, const Image *zmI
             newPlate.ts = now;
             newPlate.num = results.plates[i].topNPlates[k].characters;
             recentPlates.push_back(newPlate);
+*/
+            addPlate(results.plates[i].topNPlates[k].characters, results.plates[i].topNPlates[k].overall_confidence);
             cntDetInArea++;
         }
 
@@ -350,3 +362,19 @@ bool OpenALPRPlugin::plateIsExcluded(string plateName)
     return false;
 }
 
+bool OpenALPRPlugin::addPlate(string plateNum, float confidence)
+{
+    Info("OpenALPRPlugin::addPlate");
+    for(vector<strPlate>::iterator it = plateList.begin(); it != plateList.end(); ++it)
+    {
+        if ((*it).num == plateNum)
+        {
+            (*it).conf += confidence;
+            return;
+        }
+    }
+    strPlate newPlate;
+    newPlate.num = plateNum;
+    newPlate.conf = confidence;
+    plateList.push_back(newPlate);
+}

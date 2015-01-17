@@ -85,8 +85,12 @@ class OpenALPRPlugin : public Detector {
 
 protected:
 
-    bool checkZone(Zone *zone, unsigned int n_zone, const Image *zmImage);
+    void onCreateEvent(Zone *zone, unsigned int n_zone, Event *event);
+    void onCloseEvent(Zone *zone, unsigned int n_zone, Event *event);
+    bool checkZone(Zone *zone, unsigned int n_zone, Event *event);
+
     bool plateIsExcluded(string plateName);
+    void addPlate(string plateNum, float confidence);
 
     string m_sConfigFilePath;
     string m_sCountry;
@@ -124,7 +128,15 @@ private:
         string num;
     };
 
+    struct strPlate
+    {
+        string num;
+        float conf;
+    };
+
     vector<tsPlate> recentPlates;
+    vector<strPlate> plateList;
+
     float topConfidence;
 
     class findOlderThan
