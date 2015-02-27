@@ -43,7 +43,7 @@ OpenALPRPlugin::OpenALPRPlugin()
     m_sDetectionCause = DEFAULT_DETECTION_CAUSE;
     m_sLogPrefix = DEFAULT_PLUGIN_LOG_PREFIX;
 
-    Info("OpenALPR plugin object has been created.");
+    Info("%s: Plugin object has been created", m_sLogPrefix.c_str());
 }
 
 OpenALPRPlugin::OpenALPRPlugin(string sPluginName)
@@ -57,7 +57,7 @@ OpenALPRPlugin::OpenALPRPlugin(string sPluginName)
     m_sDetectionCause = DEFAULT_DETECTION_CAUSE;
     m_sLogPrefix = DEFAULT_PLUGIN_LOG_PREFIX;
 
-    Info("OpenALPR plugin object has been created.");
+    Info("%s: Plugin object has been created", m_sLogPrefix.c_str());
 }
 
 /*! \fn OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<string,string> > mapPluginConf)
@@ -93,7 +93,7 @@ int OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<stri
         }
         catch(error& er)
         {
-            Error("Plugin is not configured (%s)", er.what());
+            Error("%s: Plugin is not configured (%s)", m_sLogPrefix.c_str(), er.what());
             return 0;
         }
         m_sConfigFilePath = vm[(m_sConfigSectionName + string(".config_file")).c_str()].as<string>();
@@ -106,7 +106,7 @@ int OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<stri
     }
     catch(exception& ex)
     {
-        Error("Plugin is not configured (%s)", ex.what());
+        Error("%s: Plugin is not configured (%s)", m_sLogPrefix.c_str(), ex.what());
         return 0;
     }
 
@@ -119,20 +119,19 @@ int OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<stri
             if (it2->second.empty()) continue;
             if (it2->first == "MinConfidence") {
                 pluginConfig[it->first].minConfidence = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
-            } else if (it2->first == "AdaptiveConf") {
-                pluginConfig[it->first].adaptiveConf = (it2->second == "yes");
             } else if (it2->first == "MinCharacters") {
                 pluginConfig[it->first].minCharacters = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
             } else if (it2->first == "MaxCharacters") {
                 pluginConfig[it->first].maxCharacters = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
-            } else if (it2->first == "MaxExclPeriod") {
-                pluginConfig[it->first].maxExclPeriod = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
+            } else if (it2->first == "ExclPeriod") {
+                pluginConfig[it->first].ExclPeriod = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
             } else if (it2->first == "AlarmScore") {
                 pluginConfig[it->first].alarmScore = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
             }
         }
     }
 
+    // Create an instance of class Alpr and set basic configuration
     ptrAlpr = new Alpr(m_sCountry, m_sConfigFilePath);
     ptrAlpr->setTopN(m_nMaxPlateNumber);
     if ( m_bRegionIsDet )
@@ -140,12 +139,17 @@ int OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<stri
     if ( !m_sRegionTemplate.empty() )
         ptrAlpr->setDefaultRegion(m_sRegionTemplate);
 
-    topConfidence = 0;
+    // Initialize some lists
+    int nb_zones = pluginConfig.size();
+    plateList.resize(nb_zones);
+    tmpPlateList.resize(nb_zones);
+    exclPlateList.resize(nb_zones);
+    lastEventDates.resize(nb_zones);
 
     if ( ptrAlpr->isLoaded() ) {
-        Info("Plugin is configured.");
+        Info("%s: Plugin is configured", m_sLogPrefix.c_str());
     } else {
-        Error("Plugin is not configured (%s)", strerror(errno));
+        Error("%s: Plugin is not configured (%s)", m_sLogPrefix.c_str(), strerror(errno));
         delete ptrAlpr;
         return 0;
     }
@@ -173,6 +177,7 @@ OpenALPRPlugin::OpenALPRPlugin(const OpenALPRPlugin& source)
 {
 }
 
+
 /*! \fn OpenALPRPlugin:: operator=(const OpenALPRPlugin& source)
  *  \param source is the object for copying
  */
@@ -187,15 +192,74 @@ OpenALPRPlugin & OpenALPRPlugin:: operator=(const OpenALPRPlugin& source)
     return *this;
 }
 
+
 void OpenALPRPlugin::onCreateEvent(Zone *zone, unsigned int n_zone, Event *event)
 {
-    Info("OpenALPRPlugin::onCreateEvent");
+    Debug(1, "%s: Zone %s - Prepare plugin for event %d", m_sLogPrefix.c_str(), zone->Label(), event->Id());
+    plateList[n_zone].clear();
+    tmpPlateList[n_zone].clear();
+
+    /* FIXME: ExclPeriod feature is bugged
+    if (exclPlateList[n_zone].size() > 0)
+    {
+        if ((time(0) - pluginConfig[n_zone].ExclPeriod) > lastEventDates[n_zone])
+        {
+            Debug(1, "%s: Zone %s - Clear list of excluded plates (period expired)", m_sLogPrefix.c_str(), zone->Label());
+            exclPlateList[n_zone].clear();
+        }
+    }*/
 }
+
 
 void OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event)
 {
-    Info("OpenALPRPlugin::onCloseEvent");
+    Event::StringSetMap noteSetMap;
+    Event::StringSet noteSet;
+
+    // Sort plates according confidence level (higher first)
+    sort(plateList[n_zone].begin(), plateList[n_zone].end(), sortByConf());
+
+    // Set the number of plates to output
+    unsigned int topn = ( m_nMaxPlateNumber < plateList[n_zone].size() ) ? m_nMaxPlateNumber : plateList[n_zone].size();
+
+    // Delete event and exit if no plate to output
+    if (topn == 0)
+    {
+        Debug(1, "%s: Zone %s - Delete event %d (no retained plates)", m_sLogPrefix.c_str(), zone->Label(),  event->Id());
+        event->DeleteEvent();
+        return;
+    }
+
+    // Set date of event
+    lastEventDates[n_zone] = time(0);
+
+    /* FIXME: ExclPeriod feature is bugged
+    // Keep the list of plate to exclude for next event
+    exclPlateList[n_zone] = tmpPlateList[n_zone];
+    Debug(1, "%s: Zone %s - %u plate(s) in exclusion list", m_sLogPrefix.c_str(), zone->Label(), exclPlateList[n_zone].size());*/
+
+    // Display zone name
+    string sOutput = "[Zone ";
+    sOutput += zone->Label();
+    sOutput += "]\n";
+    sOutput += "Plate(s) detected:\n";
+
+    // Keep only the topn first plates with higher confidence
+    for(unsigned int i=0; i<topn;i++)
+    {
+        std::stringstream plate;
+        plate << plateList[n_zone][i].num << " (" << plateList[n_zone][i].conf << ")";
+        Debug(1, "%s: Zone %s - Plate %s detected", m_sLogPrefix.c_str(), zone->Label(), plate.str().c_str());
+        sOutput += "-" + plate.str() + "\n";
+    }
+
+    // Add plates to event's note
+    noteSet.insert(sOutput);
+    noteSetMap[m_sDetectionCause] = noteSet;
+    Info("%s: Zone %s - Add plates to event %d", m_sLogPrefix.c_str(), zone->Label(), event->Id());
+    event->updateNotes(noteSetMap);
 }
+
 
 /*! \fn OpenALPRPlugin::checkZone(Zone *zone, const Image *zmImage)
  *  \param zone is a zone where license plates will be detected
@@ -204,16 +268,7 @@ void OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event)
  */
 bool OpenALPRPlugin::checkZone(Zone *zone, unsigned int n_zone, const Image *zmImage)
 {
-    double score;
-    string sOutput;
     Polygon zone_polygon = Polygon(zone->GetPolygon()); // Polygon of interest of the processed zone.
-
-    // Get region of interest for the processed zone
-    // Currently openalpr only support rectangle region of interests
-    //std::vector<AlprRegionOfInterest> regionsOfInterest;
-    //AlprRegionOfInterest region = {zone_polygon.Extent().LoX(), zone_polygon.Extent().LoY(), zone_polygon.Extent().Width(), zone_polygon.Extent().Height()};
-    //regionsOfInterest.push_back(region);
-    //Info("RegionOfInterest: (LoX=%d, LoY=%d) - (Width=%d, Height=%d)", zone_polygon.Extent().LoX(), zone_polygon.Extent().LoY(), zone_polygon.Extent().Width(), zone_polygon.Extent().Height());
 
     Image *pMaskImage = new Image(zmImage->Width(), zmImage->Height(), ZM_COLOUR_GRAY8, ZM_SUBPIX_ORDER_NONE );
     pMaskImage->Fill(BLACK);
@@ -238,7 +293,7 @@ bool OpenALPRPlugin::checkZone(Zone *zone, unsigned int n_zone, const Image *zmI
     // Region of interest don't work as expected
     //std::vector<AlprResults> results = ptrAlpr->recognize(buffer, regionsOfInterest);
     AlprResults results = ptrAlpr->recognize(cvInputImage.data, cvInputImage.elemSize(), cvInputImage.cols, cvInputImage.rows, regionsOfInterest);
-    score = 0;
+    double score = 0;
 
     for (unsigned int i = 0; i < results.plates.size(); i++) {
         int x1 = results.plates[i].plate_points[0].x, y1 = results.plates[i].plate_points[0].y;
@@ -255,65 +310,54 @@ bool OpenALPRPlugin::checkZone(Zone *zone, unsigned int n_zone, const Image *zmI
         // consider rectangle as belonging to the zone
         // otherwise process next object
         if (nNumVertInside < 3)
+        {
+            Debug(1, "%s: Zone %s - Skip result (outside detection zone)", m_sLogPrefix.c_str(), zone->Label());
             continue;
-
-        int cntDetInArea = 0;
-        time_t now = time(0);
-
-        // Remove plates from exclusion list after period expiration
-        recentPlates.erase(remove_if(recentPlates.begin(), recentPlates.end(),
-                    findOlderThan(now - pluginConfig[n_zone].maxExclPeriod)), recentPlates.end());
-
-        for (unsigned int k = 0; k < results.plates[i].topNPlates.size(); k++) {
-
-            // Disqualify plate if under the minimum confidence level
-            if (results.plates[i].topNPlates[k].overall_confidence < pluginConfig[n_zone].minConfidence)
-                continue;
-
-            // Disqualify plate if not enough characters or too much characters
-            if ((results.plates[i].topNPlates[k].characters.size() < pluginConfig[n_zone].minCharacters)
-                    || (results.plates[i].topNPlates[k].characters.size() > pluginConfig[n_zone].maxCharacters))
-                continue;
-
-            // Disqualify plate if already in exclusion period
-/*            if (plateIsExcluded(results.plates[i].topNPlates[k].characters))
-            continue;
-*/
-            // Set confidence level
-/*            if (pluginConfig[n_zone].adaptiveConf) {
-                if (topConfidence < results.plates[i].topNPlates[k].overall_confidence)
-                {
-                    topConfidence = results.plates[i].topNPlates[k].overall_confidence;
-                } else
-                    continue;
-            }
-
-            if (cntDetInArea == 0) {
-                std::stringstream title;
-                title << "Plate detected #" << i << " with potential matches:";
-                sOutput = title.str();
-                Info(sOutput.c_str());
-                sOutput += "\n";
-            }
-
-            std::stringstream result;
-            result << "- " << results.plates[i].topNPlates[k].characters
-                   << " (confidence: " << results.plates[i].topNPlates[k].overall_confidence
-                   << ", template_match: " << results.plates[i].topNPlates[k].matches_template << ")";
-            Info("%s", result.str().c_str());
-            sOutput += result.str() + "\n";
-
-            // Add plate to exclusion list
-            tsPlate newPlate;
-            newPlate.ts = now;
-            newPlate.num = results.plates[i].topNPlates[k].characters;
-            recentPlates.push_back(newPlate);
-*/
-            addPlate(results.plates[i].topNPlates[k].characters, results.plates[i].topNPlates[k].overall_confidence);
-            cntDetInArea++;
         }
 
-        if (cntDetInArea == 0)
+        int cntDetPlates = 0;
+
+        for (unsigned int k = 0; k < results.plates[i].topNPlates.size(); k++)
+        {
+            strPlate detPlate;
+            detPlate.num = results.plates[i].topNPlates[k].characters;
+            detPlate.conf = results.plates[i].topNPlates[k].overall_confidence;
+
+            // Disqualify plate if under the minimum confidence level
+            if (detPlate.conf < pluginConfig[n_zone].minConfidence)
+            {
+                Debug(1, "%s: Zone %s - Skip plate %s (under minimum confidence level)", m_sLogPrefix.c_str(), zone->Label(), detPlate.num.c_str());
+                continue;
+            }
+
+            // Disqualify plate if not enough characters or too much characters
+            if ((detPlate.num.size() < pluginConfig[n_zone].minCharacters)
+                    || (detPlate.num.size() > pluginConfig[n_zone].maxCharacters))
+            {
+                Debug(1, "%s: Zone %s - Skip plate %s (number of characters is out of range)", m_sLogPrefix.c_str(), zone->Label(), detPlate.num.c_str());
+                continue;
+            }
+
+            /* FIXME: ExclPeriod feature is bugged
+            // Disqualify plate if in exclusion period
+            if (plateIsExcluded(n_zone, detPlate.num))
+            {
+                Debug(1, "%s: Zone %s - Skip plate %s (exists in exclusion list)", m_sLogPrefix.c_str(), zone->Label(), detPlate.num.c_str());
+                continue;
+            }*/
+
+            // Add plate to list (if already in list, update confidence by adding new value)
+            if (addPlate(zone, n_zone, detPlate))
+            {
+                Debug(1, "%s: Zone %s - Skip plate %s (already detected)", m_sLogPrefix.c_str(), zone->Label(), detPlate.num.c_str());
+                continue;
+            }
+
+            Debug(1, "%s: Zone %s - Plate %s added to list", m_sLogPrefix.c_str(), zone->Label(), detPlate.num.c_str());
+            cntDetPlates++;
+        }
+
+        if (cntDetPlates == 0)
             continue;
 
         // Raise an alarm if at least one plate has been detected
@@ -327,11 +371,10 @@ bool OpenALPRPlugin::checkZone(Zone *zone, unsigned int n_zone, const Image *zmI
     if (score == 0) {
         delete pMaskImage;
         delete tempZmImage;
-        return( false );
+        return false;
     }
 
     zone->SetScore((int)score);
-    zone->SetText(sOutput);
 
     //Get mask by highlighting contours of objects and overlaying them with previous contours.
     Rgb alarm_colour = RGB_GREEN;
@@ -354,27 +397,41 @@ bool OpenALPRPlugin::checkZone(Zone *zone, unsigned int n_zone, const Image *zmI
     return true;
 }
 
-bool OpenALPRPlugin::plateIsExcluded(string plateName)
+//FIXME: ExclPeriod feature is bugged
+bool OpenALPRPlugin::plateIsExcluded(unsigned int n_zone, string plateNum)
 {
-    for(vector<tsPlate>::iterator it = recentPlates.begin(); it != recentPlates.end(); ++it)
-        if ((*it).num == plateName)
+    for(vector<string>::iterator it = exclPlateList[n_zone].begin(); it != exclPlateList[n_zone].end(); ++it)
+        if (*it == plateNum)
             return true;
+
     return false;
 }
 
-void OpenALPRPlugin::addPlate(string plateNum, float confidence)
+bool OpenALPRPlugin::addPlate(Zone *zone, unsigned int n_zone, strPlate detPlate)
 {
-    Info("OpenALPRPlugin::addPlate");
-    for(vector<strPlate>::iterator it = plateList.begin(); it != plateList.end(); ++it)
+    for (vector<strPlate>::iterator it = plateList[n_zone].begin(); it != plateList[n_zone].end(); ++it)
     {
-        if ((*it).num == plateNum)
+        // If plate number exists in the list for this zone
+        if ((*it).num == detPlate.num)
         {
-            (*it).conf += confidence;
-            return;
+            // Add confidence
+            (*it).conf += detPlate.conf;
+            Debug(1, "%s: Zone %s - Raise confidence of plate %s to %f", m_sLogPrefix.c_str(), zone->Label(), (*it).num.c_str(), (*it).conf);
+            return false;
         }
     }
-    strPlate newPlate;
-    newPlate.num = plateNum;
-    newPlate.conf = confidence;
-    plateList.push_back(newPlate);
+
+    // Add a new plate for this zone
+    Debug(1, "%s: Zone %s - Add plate %s with confidence %f", m_sLogPrefix.c_str(), zone->Label(), detPlate.num.c_str(), detPlate.conf);
+    plateList[n_zone].push_back(detPlate);
+
+    /* FIXME: ExclPeriod feature is bugged (with the reference video monitored in loop, plates are no more detected after some hours)
+    // Add plate to exclusion list if an exclusion period is set
+    if (pluginConfig[n_zone].ExclPeriod > 0)
+    {
+        Debug(1, "%s: Zone %s - Add plate %s to exclusion list", m_sLogPrefix.c_str(), zone->Label(), detPlate.num.c_str());
+        tmpPlateList[n_zone].push_back(detPlate.num);
+    }*/
+
+    return true;
 }

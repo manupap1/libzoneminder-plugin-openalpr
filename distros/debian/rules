@@ -34,12 +34,12 @@ BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 HEAD = $(shell git rev-parse HEAD)
 PKD  = $(abspath $(dir $(MAKEFILE_LIST)))
 PKG  = $(word 2,$(shell dpkg-parsechangelog -l$(PKD)/changelog | grep ^Source))
-VER ?= $(shell dpkg-parsechangelog -l$(PKD)/changelog | perl -ne 'print $$1 if m{^Version:\s+(?:\d+:)?(\d.*)(?:\-\d+.*)};')
+VER ?= $(shell dpkg-parsechangelog -l$(PKD)/changelog | perl -ne 'print $$1 if m{^Version:\s+(?:\d+:)?(\d.*)(?:\-|\+nmu\d+.*)};')
 DTYPE =
 TARBALL = ../$(PKG)_$(VER)$(DTYPE).orig.tar.xz
 
 %:
-	dh $@ --with quilt,autoreconf
+	dh $@ --with autoreconf
 
 .PHONY: override_dh_strip
 override_dh_strip:

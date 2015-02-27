@@ -53,7 +53,7 @@
 #define DEFAULT_ADAPTIVE_CONF 0
 #define DEFAULT_MIN_CHARACTERS 0
 #define DEFAULT_MAX_CHARACTERS 99
-#define DEFAULT_MAX_EXCL_PERIOD 0
+#define DEFAULT_EXCL_PERIOD 0
 
 using namespace std;
 using namespace alpr;
@@ -89,9 +89,6 @@ protected:
     void onCloseEvent(Zone *zone, unsigned int n_zone, Event *event);
     bool checkZone(Zone *zone, unsigned int n_zone, const Image *zmImage);
 
-    bool plateIsExcluded(string plateName);
-    void addPlate(string plateNum, float confidence);
-
     string m_sConfigFilePath;
     string m_sCountry;
     string m_sRegionTemplate;
@@ -105,28 +102,20 @@ private:
     struct pConf
     {
         unsigned int minConfidence;
-        bool adaptiveConf;
         unsigned int minCharacters;
         unsigned int maxCharacters;
-        unsigned int maxExclPeriod;
+        unsigned int ExclPeriod;
         unsigned int alarmScore;
         pConf():
             minConfidence(DEFAULT_MIN_CONFIDENCE),
-            adaptiveConf(DEFAULT_ADAPTIVE_CONF),
             minCharacters(DEFAULT_MIN_CHARACTERS),
             maxCharacters(DEFAULT_MAX_CHARACTERS),
-            maxExclPeriod(DEFAULT_MAX_EXCL_PERIOD),
+            ExclPeriod(DEFAULT_EXCL_PERIOD),
             alarmScore(DEFAULT_ALARM_SCORE)
         {}
     };
 
     vector<pConf> pluginConfig;
-
-    struct tsPlate
-    {
-        time_t ts;
-        string num;
-    };
 
     struct strPlate
     {
@@ -134,21 +123,21 @@ private:
         float conf;
     };
 
-    vector<tsPlate> recentPlates;
-    vector<strPlate> plateList;
-
-    float topConfidence;
-
-    class findOlderThan
+    struct sortByConf
     {
-        time_t _ts;
-    public:
-        findOlderThan(const time_t &ts) : _ts(ts) {}
-        bool operator()(const tsPlate &item) const
+        bool operator()(const strPlate a, const strPlate b) const
         {
-            return item.ts < _ts;
+            return a.conf > b.conf;
         }
     };
+
+    vector<vector<strPlate> > plateList;
+    vector<vector<string> > tmpPlateList;
+    vector<vector<string> > exclPlateList;
+    vector<time_t> lastEventDates;
+
+    bool plateIsExcluded(unsigned int n_zone, string plateName);
+    bool addPlate(Zone *zone, unsigned int n_zone, strPlate detPlate);
 
 };
 #endif // OPENALPR_PLUGIN_H

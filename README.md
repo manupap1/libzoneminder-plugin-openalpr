@@ -31,7 +31,6 @@ cd ZoneMinder/
 git fetch origin plugin_support:plugin_support
 git checkout plugin_support
 cp -R distros/debian8 ./debian
-fakeroot debian/rules get-orig-source
 sudo apt-get install debhelper po-debconf dh-systemd autoconf automake quilt libphp-serialization-perl libgnutls28-dev libmysqlclient-dev libdbd-mysql-perl libdate-manip-perl libwww-perl libjpeg62-turbo-dev libpcre3-dev libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libv4l-dev libbz2-dev libtool libsys-mmap-perl libnetpbm10-dev libavdevice-dev libdevice-serialport-perl libarchive-zip-perl libmime-lite-perl dh-autoreconf libvlccore-dev libvlc-dev libcurl4-openssl-dev libgcrypt20-dev libpolkit-gobject-1-dev libdbi-perl libnet-sftp-foreign-perl libexpect-perl libmime-tools-perl pkg-config
 debuild
 ```
@@ -59,7 +58,6 @@ Compilation of libzoneminder-plugin-openalpr
 git clone https://github.com/manupap1/libzoneminder-plugin-openalpr.git
 cd libzoneminder-plugin-openalpr
 cp -R distros/debian ./
-fakeroot debian/rules get-orig-source
 sudo apt-get install debhelper quilt dh-autoreconf pkg-config libboost-program-options1.55-dev libopencv-dev libopencv-core-dev libopencv-imgproc-dev
 debuild
 ```
@@ -103,10 +101,8 @@ The first options are available for all plugins:
 
 The next options are specifics to this plugin and can be used to adjust the detection accuracy:
 - `Minimum Confidence` - A text box to enter the minimum confidence level. All plates with a lower confidence level will be excluded.
-- `Adaptive Confidence` - A yes/no select box to enable or disable the adaptive adjustment of the minimum confidence level. This option should no be used (experimental setting).
-- `Minimum Number of Characters` - A text box to enter the minimum number of characters in a license plate. All plates with a lower number of detected characters will be excluded.
-- `Maximum Number of Characters` - A text box to enter the maximum number of characters in a license plate. All plates with a greater number of detected characters will be excluded.
-- `Maximum Exclusion Period` - A text box to enter the period of time (in seconds) in which already detected license plates will be excluded.
+- `Min. Number of Characters` - A text box to enter the minimum number of characters in a license plate. All plates with a lower number of detected characters will be excluded.
+- `Max. Number of Characters` - A text box to enter the maximum number of characters in a license plate. All plates with a greater number of detected characters will be excluded.
 
 The configuration is saved to the database and applied when clicking on the `Save` button.
 

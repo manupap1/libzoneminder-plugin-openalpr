@@ -28,12 +28,6 @@ $pluginOptions = array(
         'Max' => '100',
         'Value' => '0'
     ),
-    'AdaptiveConf' => array(
-        'Type' => 'select',
-        'Name' => 'AdaptiveConf',
-        'Choices' => 'Yes,No',
-        'Value'=> 'No'
-    ),
     'MinCharacters' => array(
         'Type' => 'integer',
         'Name' => 'MinCharacters',
@@ -48,13 +42,15 @@ $pluginOptions = array(
         'Max' => '20',
         'Value' => '20'
     ),
-    'MaxExclPeriod' => array(
+/* FIXME: Option disable (buggy feature: plates are no longer detected after some hours)
+    'ExclPeriod' => array(
         'Type' => 'integer',
-        'Name' => 'MaxExclPeriod',
+        'Name' => 'ExclPeriod',
         'Min' => '0',
         'Max' => '3600',
         'Value' => '0'
     )
+*/
 );
 
 ?>
