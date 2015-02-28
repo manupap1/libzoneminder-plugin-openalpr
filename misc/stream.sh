@@ -11,7 +11,7 @@
 #IP_ADDR=0.0.0.0
 
 # RTSP port where the stream will be reachable
-#PORT=554
+#PORT=8554
 
 # Path to the SDP file
 #SDP_PATH=/media.sdp
@@ -39,7 +39,7 @@ if [ -z "$VLC_BIN" ]; then
 fi
 
 [ -z "$IP_ADDR" ] && IP_ADDR=0.0.0.0
-[ -z "$PORT" ] && PORT=554
+[ -z "$PORT" ] && PORT=8554
 [ -z "$SDP_PATH" ] && SDP_PATH=/media.sdp
 PID_FILE="$HOME/vlc_$(basename $2).pid"
 
