@@ -15,7 +15,7 @@ libzoneminder-plugin-openalpr requires:
 
 ### Installation
 
-#### Debian
+#### Debian Jessie (64 bits)
 
 Currently the plugin framework is not supported in upstream ZoneMinder.
 ZoneMinder with plugin support can be built from the repository https://github.com/manupap1/ZoneMinder
