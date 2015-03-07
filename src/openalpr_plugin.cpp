@@ -347,13 +347,8 @@ bool OpenALPRPlugin::checkZone(Zone *zone, unsigned int n_zone, const Image *zmI
             }*/
 
             // Add plate to list (if already in list, update confidence by adding new value)
-            if (addPlate(zone, n_zone, detPlate))
-            {
-                Debug(1, "%s: Zone %s - Skip plate %s (already detected)", m_sLogPrefix.c_str(), zone->Label(), detPlate.num.c_str());
-                continue;
-            }
+            addPlate(zone, n_zone, detPlate);
 
-            Debug(1, "%s: Zone %s - Plate %s added to list", m_sLogPrefix.c_str(), zone->Label(), detPlate.num.c_str());
             cntDetPlates++;
         }
 
