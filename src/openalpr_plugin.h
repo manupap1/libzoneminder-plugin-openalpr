@@ -86,7 +86,7 @@ class OpenALPRPlugin : public Detector {
 protected:
 
     void onCreateEvent(Zone *zone, unsigned int n_zone, Event *event);
-    void onCloseEvent(Zone *zone, unsigned int n_zone, Event *event);
+    void onCloseEvent(Zone *zone, unsigned int n_zone, Event *event, string textOutput);
     bool checkZone(Zone *zone, unsigned int n_zone, const Image *zmImage);
 
     string m_sConfigFilePath;

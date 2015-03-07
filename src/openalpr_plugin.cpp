@@ -143,7 +143,7 @@ int OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<stri
     int nb_zones = pluginConfig.size();
     plateList.resize(nb_zones);
     tmpPlateList.resize(nb_zones);
-    exclPlateList.resize(nb_zones);
+    //exclPlateList.resize(nb_zones);
     //lastEventDates.resize(nb_zones);
 
     if ( ptrAlpr->isLoaded() ) {
@@ -196,8 +196,9 @@ OpenALPRPlugin & OpenALPRPlugin:: operator=(const OpenALPRPlugin& source)
 void OpenALPRPlugin::onCreateEvent(Zone *zone, unsigned int n_zone, Event *event)
 {
     Debug(1, "%s: Zone %s - Prepare plugin for event %d", m_sLogPrefix.c_str(), zone->Label(), event->Id());
-    plateList[n_zone].clear();
-    tmpPlateList[n_zone].clear();
+
+    // Note: Do not clear the plate list here because it is filled with results of first detection
+    //       in case of post processing
 
     /* FIXME: ExclPeriod feature is bugged
     if (exclPlateList[n_zone].size() > 0)
@@ -211,7 +212,7 @@ void OpenALPRPlugin::onCreateEvent(Zone *zone, unsigned int n_zone, Event *event
 }
 
 
-void OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event)
+void OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event, string textOutput)
 {
     // Set the number of plates to output and exit if nothing to do
     unsigned int topn = ( m_nMaxPlateNumber < plateList[n_zone].size() ) ? m_nMaxPlateNumber : plateList[n_zone].size();
@@ -228,27 +229,22 @@ void OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event)
     exclPlateList[n_zone] = tmpPlateList[n_zone];
     Debug(1, "%s: Zone %s - %u plate(s) in exclusion list", m_sLogPrefix.c_str(), zone->Label(), exclPlateList[n_zone].size());*/
 
-    // Display zone name
-    string sOutput = "[Zone ";
-    sOutput += zone->Label();
-    sOutput += "]\n";
-
-    // Format plate output and keep only the topn first plates
+    // Format plate list and keep only the topn first plates
     for(unsigned int i=0; i<topn;i++)
     {
         std::stringstream plate;
         plate << plateList[n_zone][i].num << " (" << plateList[n_zone][i].conf << ")";
         Debug(1, "%s: Zone %s - Plate %s detected", m_sLogPrefix.c_str(), zone->Label(), plate.str().c_str());
-        sOutput += "   " + plate.str() + "\n";
+        textOutput += "   " + plate.str() + "\n";
     }
 
     // Add plates to event's note
-    Event::StringSet noteSet;
-    noteSet.insert(sOutput);
-    Event::StringSetMap noteSetMap;
-    noteSetMap[m_sDetectionCause] = noteSet;
     Info("%s: Zone %s - Add plates to event %d", m_sLogPrefix.c_str(), zone->Label(), event->Id());
-    event->updateNotes(noteSetMap);
+    event->addNote(m_sDetectionCause, textOutput);
+
+    // Reset the lists for next use
+    plateList[n_zone].clear();
+    tmpPlateList[n_zone].clear();
 }
 
 
