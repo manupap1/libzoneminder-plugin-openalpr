@@ -24,7 +24,6 @@ $PLANG = array(
         'MinConfidence'         => 'Confiance minimum',
         'MinCharacters'         => 'Nombre min. de caractères',
         'MaxCharacters'         => 'Nombre max. de caractères',
-        'ExclPeriod'            => 'Durée d\'exclusion',
 );
 
 ?>

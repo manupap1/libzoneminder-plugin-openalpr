@@ -86,7 +86,7 @@ class OpenALPRPlugin : public Detector {
 protected:
 
     void onCreateEvent(Zone *zone, unsigned int n_zone, Event *event);
-    void onCloseEvent(Zone *zone, unsigned int n_zone, Event *event, string textOutput);
+    void onCloseEvent(Zone *zone, unsigned int n_zone, Event *event, string &noteText);
     bool checkZone(Zone *zone, unsigned int n_zone, const Image *zmImage);
 
     string m_sConfigFilePath;
@@ -104,13 +104,11 @@ private:
         unsigned int minConfidence;
         unsigned int minCharacters;
         unsigned int maxCharacters;
-        unsigned int ExclPeriod;
         unsigned int alarmScore;
         pConf():
             minConfidence(DEFAULT_MIN_CONFIDENCE),
             minCharacters(DEFAULT_MIN_CHARACTERS),
             maxCharacters(DEFAULT_MAX_CHARACTERS),
-            ExclPeriod(DEFAULT_EXCL_PERIOD),
             alarmScore(DEFAULT_ALARM_SCORE)
         {}
     };
@@ -133,10 +131,7 @@ private:
 
     vector<vector<strPlate> > plateList;
     vector<vector<string> > tmpPlateList;
-    vector<vector<string> > exclPlateList;
-    vector<time_t> lastEventDates;
 
-    bool plateIsExcluded(unsigned int n_zone, string plateName);
     bool addPlate(Zone *zone, unsigned int n_zone, strPlate detPlate);
 
 };

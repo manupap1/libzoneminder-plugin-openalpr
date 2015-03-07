@@ -123,8 +123,6 @@ int OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<stri
                 pluginConfig[it->first].minCharacters = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
             } else if (it2->first == "MaxCharacters") {
                 pluginConfig[it->first].maxCharacters = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
-            } else if (it2->first == "ExclPeriod") {
-                pluginConfig[it->first].ExclPeriod = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
             } else if (it2->first == "AlarmScore") {
                 pluginConfig[it->first].alarmScore = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
             }
@@ -143,8 +141,6 @@ int OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<stri
     int nb_zones = pluginConfig.size();
     plateList.resize(nb_zones);
     tmpPlateList.resize(nb_zones);
-    //exclPlateList.resize(nb_zones);
-    //lastEventDates.resize(nb_zones);
 
     if ( ptrAlpr->isLoaded() ) {
         Info("%s: Plugin is configured", m_sLogPrefix.c_str());
@@ -193,26 +189,29 @@ OpenALPRPlugin & OpenALPRPlugin:: operator=(const OpenALPRPlugin& source)
 }
 
 
+/*! \fn OpenALPRPlugin::onCreateEvent(Zone *zone, unsigned int n_zone, Event *event)
+ * \param zone is a pointer to the zone that triggered the event
+ * \param n_zone is the zone id
+ * \param event is a pointer the new event
+ */
 void OpenALPRPlugin::onCreateEvent(Zone *zone, unsigned int n_zone, Event *event)
 {
     Debug(1, "%s: Zone %s - Prepare plugin for event %d", m_sLogPrefix.c_str(), zone->Label(), event->Id());
 
-    // Note: Do not clear the plate list here because it is filled with results of first detection
-    //       in case of post processing
+    /* Note: Do not clear the plate list here because in case of post processing
+     *       the plate list is filled with results of first detection before
+     *       event creation */
 
-    /* FIXME: ExclPeriod feature is bugged
-    if (exclPlateList[n_zone].size() > 0)
-    {
-        if ((time(0) - pluginConfig[n_zone].ExclPeriod) > lastEventDates[n_zone])
-        {
-            Debug(1, "%s: Zone %s - Clear list of excluded plates (period expired)", m_sLogPrefix.c_str(), zone->Label());
-            exclPlateList[n_zone].clear();
-        }
-    }*/
 }
 
 
-void OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event, string textOutput)
+/*! \fn OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event, string noteText)
+ *  \param zone is a pointer to the zone that triggered the event
+ *  \param n_zone is the zone id
+ *  \param event is a pointer to the event that will be closed
+ *  \param noteText is a string that can be used to output text to the event note
+ */
+void OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event, string &noteText)
 {
     // Set the number of plates to output and exit if nothing to do
     unsigned int topn = ( m_nMaxPlateNumber < plateList[n_zone].size() ) ? m_nMaxPlateNumber : plateList[n_zone].size();
@@ -221,26 +220,16 @@ void OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event,
     // Sort plates according confidence level (higher first)
     sort(plateList[n_zone].begin(), plateList[n_zone].end(), sortByConf());
 
-    /* FIXME: ExclPeriod feature is bugged
-    // Set date of event
-    lastEventDates[n_zone] = time(0);
+    Info("%s: Zone %s - Add plates to event %d", m_sLogPrefix.c_str(), zone->Label(), event->Id());
 
-    // Keep the list of plate to exclude for next event
-    exclPlateList[n_zone] = tmpPlateList[n_zone];
-    Debug(1, "%s: Zone %s - %u plate(s) in exclusion list", m_sLogPrefix.c_str(), zone->Label(), exclPlateList[n_zone].size());*/
-
-    // Format plate list and keep only the topn first plates
+    // Output only the first topn plates to the event note
     for(unsigned int i=0; i<topn;i++)
     {
         std::stringstream plate;
         plate << plateList[n_zone][i].num << " (" << plateList[n_zone][i].conf << ")";
         Debug(1, "%s: Zone %s - Plate %s detected", m_sLogPrefix.c_str(), zone->Label(), plate.str().c_str());
-        textOutput += "   " + plate.str() + "\n";
+        noteText += "   " + plate.str() + "\n";
     }
-
-    // Add plates to event's note
-    Info("%s: Zone %s - Add plates to event %d", m_sLogPrefix.c_str(), zone->Label(), event->Id());
-    event->addNote(m_sDetectionCause, textOutput);
 
     // Reset the lists for next use
     plateList[n_zone].clear();
@@ -250,6 +239,7 @@ void OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event,
 
 /*! \fn OpenALPRPlugin::checkZone(Zone *zone, const Image *zmImage)
  *  \param zone is a zone where license plates will be detected
+ *  \param n_zone is the zone id
  *  \param zmImage is an image to perform license plate detection (in the form of ZM' Image)
  *  \return true if there were objects detected in given image and false otherwise
  */
@@ -325,14 +315,6 @@ bool OpenALPRPlugin::checkZone(Zone *zone, unsigned int n_zone, const Image *zmI
                 continue;
             }
 
-            /* FIXME: ExclPeriod feature is bugged
-            // Disqualify plate if in exclusion period
-            if (plateIsExcluded(n_zone, detPlate.num))
-            {
-                Debug(1, "%s: Zone %s - Skip plate %s (exists in exclusion list)", m_sLogPrefix.c_str(), zone->Label(), detPlate.num.c_str());
-                continue;
-            }*/
-
             // Add plate to list (if already in list, update confidence by adding new value)
             addPlate(zone, n_zone, detPlate);
 
@@ -379,15 +361,6 @@ bool OpenALPRPlugin::checkZone(Zone *zone, unsigned int n_zone, const Image *zmI
     return true;
 }
 
-//FIXME: ExclPeriod feature is bugged
-bool OpenALPRPlugin::plateIsExcluded(unsigned int n_zone, string plateNum)
-{
-    for(vector<string>::iterator it = exclPlateList[n_zone].begin(); it != exclPlateList[n_zone].end(); ++it)
-        if (*it == plateNum)
-            return true;
-
-    return false;
-}
 
 bool OpenALPRPlugin::addPlate(Zone *zone, unsigned int n_zone, strPlate detPlate)
 {
@@ -406,14 +379,6 @@ bool OpenALPRPlugin::addPlate(Zone *zone, unsigned int n_zone, strPlate detPlate
     // Add a new plate for this zone
     Debug(1, "%s: Zone %s - Add plate %s with confidence %f", m_sLogPrefix.c_str(), zone->Label(), detPlate.num.c_str(), detPlate.conf);
     plateList[n_zone].push_back(detPlate);
-
-    /* FIXME: ExclPeriod feature is bugged (with the reference video monitored in loop, plates are no more detected after some hours)
-    // Add plate to exclusion list if an exclusion period is set
-    if (pluginConfig[n_zone].ExclPeriod > 0)
-    {
-        Debug(1, "%s: Zone %s - Add plate %s to exclusion list", m_sLogPrefix.c_str(), zone->Label(), detPlate.num.c_str());
-        tmpPlateList[n_zone].push_back(detPlate.num);
-    }*/
 
     return true;
 }
