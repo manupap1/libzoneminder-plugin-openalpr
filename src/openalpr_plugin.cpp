@@ -144,7 +144,7 @@ int OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<stri
     plateList.resize(nb_zones);
     tmpPlateList.resize(nb_zones);
     exclPlateList.resize(nb_zones);
-    lastEventDates.resize(nb_zones);
+    //lastEventDates.resize(nb_zones);
 
     if ( ptrAlpr->isLoaded() ) {
         Info("%s: Plugin is configured", m_sLogPrefix.c_str());
@@ -213,27 +213,17 @@ void OpenALPRPlugin::onCreateEvent(Zone *zone, unsigned int n_zone, Event *event
 
 void OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event)
 {
-    Event::StringSetMap noteSetMap;
-    Event::StringSet noteSet;
+    // Set the number of plates to output and exit if nothing to do
+    unsigned int topn = ( m_nMaxPlateNumber < plateList[n_zone].size() ) ? m_nMaxPlateNumber : plateList[n_zone].size();
+    if (topn == 0) return;
 
     // Sort plates according confidence level (higher first)
     sort(plateList[n_zone].begin(), plateList[n_zone].end(), sortByConf());
 
-    // Set the number of plates to output
-    unsigned int topn = ( m_nMaxPlateNumber < plateList[n_zone].size() ) ? m_nMaxPlateNumber : plateList[n_zone].size();
-
-    // Delete event and exit if no plate to output
-    if (topn == 0)
-    {
-        Debug(1, "%s: Zone %s - Delete event %d (no retained plates)", m_sLogPrefix.c_str(), zone->Label(),  event->Id());
-        event->DeleteEvent();
-        return;
-    }
-
+    /* FIXME: ExclPeriod feature is bugged
     // Set date of event
     lastEventDates[n_zone] = time(0);
 
-    /* FIXME: ExclPeriod feature is bugged
     // Keep the list of plate to exclude for next event
     exclPlateList[n_zone] = tmpPlateList[n_zone];
     Debug(1, "%s: Zone %s - %u plate(s) in exclusion list", m_sLogPrefix.c_str(), zone->Label(), exclPlateList[n_zone].size());*/
@@ -243,7 +233,7 @@ void OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event)
     sOutput += zone->Label();
     sOutput += "]\n";
 
-    // Keep only the topn first plates with higher confidence
+    // Format plate output and keep only the topn first plates
     for(unsigned int i=0; i<topn;i++)
     {
         std::stringstream plate;
@@ -253,7 +243,9 @@ void OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event)
     }
 
     // Add plates to event's note
+    Event::StringSet noteSet;
     noteSet.insert(sOutput);
+    Event::StringSetMap noteSetMap;
     noteSetMap[m_sDetectionCause] = noteSet;
     Info("%s: Zone %s - Add plates to event %d", m_sLogPrefix.c_str(), zone->Label(), event->Id());
     event->updateNotes(noteSetMap);
