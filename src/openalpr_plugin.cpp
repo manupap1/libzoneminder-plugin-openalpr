@@ -242,7 +242,6 @@ void OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event)
     string sOutput = "[Zone ";
     sOutput += zone->Label();
     sOutput += "]\n";
-    sOutput += "Plate(s) detected:\n";
 
     // Keep only the topn first plates with higher confidence
     for(unsigned int i=0; i<topn;i++)
@@ -250,7 +249,7 @@ void OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event)
         std::stringstream plate;
         plate << plateList[n_zone][i].num << " (" << plateList[n_zone][i].conf << ")";
         Debug(1, "%s: Zone %s - Plate %s detected", m_sLogPrefix.c_str(), zone->Label(), plate.str().c_str());
-        sOutput += "-" + plate.str() + "\n";
+        sOutput += "   " + plate.str() + "\n";
     }
 
     // Add plates to event's note
