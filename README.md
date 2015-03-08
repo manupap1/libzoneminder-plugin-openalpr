@@ -119,7 +119,7 @@ Licenses plates are stored in the event note field accessible by a click on the 
 
 Alarmed frames are highlighted with the plate's detection area(s).
 
-![Frame](https://github.com/manupap1/libzoneminder-plugin-openalpr/blob/master/misc/image.png)
+![Frame](https://github.com/manupap1/libzoneminder-plugin-openalpr/blob/master/misc/frame.png)
 
 ### Improvement / Contribution
 

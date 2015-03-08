@@ -228,7 +228,7 @@ void OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event,
         std::stringstream plate;
         plate << plateList[n_zone][i].num << " (" << plateList[n_zone][i].conf << ")";
         Debug(1, "%s: Zone %s - Plate %s detected", m_sLogPrefix.c_str(), zone->Label(), plate.str().c_str());
-        noteText += "   " + plate.str() + "\n";
+        noteText += "    " + plate.str() + "\n";
     }
 
     // Reset the lists for next use
