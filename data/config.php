@@ -23,25 +23,53 @@
 $pluginOptions = array(
     'MinConfidence' => array(
         'Type' => 'integer',
-        'Name' => 'MinConfidence',
         'Min' => '0',
         'Max' => '100',
-        'Value' => '0'
+        'Value' => '0',
+        'Require' => array(
+            array(
+               'Name' => 'OnlyTargetedPlates',
+               'Value' => 'No',
+            ),
+        ),
     ),
     'MinCharacters' => array(
         'Type' => 'integer',
-        'Name' => 'MinCharacters',
         'Min' => '1',
         'Max' => '20',
-        'Value' => '1'
+        'Value' => '1',
+        'Require' => array(
+            array(
+               'Name' => 'OnlyTargetedPlates',
+               'Value' => 'No',
+            ),
+        ),
     ),
     'MaxCharacters' => array(
         'Type' => 'integer',
-        'Name' => 'MaxCharacters',
         'Min' => '1',
         'Max' => '20',
-        'Value' => '20'
-    )
+        'Value' => '20',
+        'Require' => array(
+            array(
+               'Name' => 'StrictTargeting',
+               'Value' => 'No',
+            ),
+        ),
+    ),
+    'TargetedPlateList' => array(
+        'Type' => 'list',
+    ),
+    'OnlyTargetedPlates' => array(
+        'Type' => 'select',
+        'Choices' => 'Yes,No',
+        'Value'=> 'No',
+    ),
+    'StrictTargeting' => array(
+        'Type' => 'select',
+        'Choices' => 'Yes,No',
+        'Value'=> 'No',
+    ),
 );
 
 ?>

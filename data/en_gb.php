@@ -21,9 +21,12 @@
  * ****************************************************************************/
 
 $PLANG = array(
-        'MinConfidence'         => 'Minimum Confidence',
-        'MinCharacters'         => 'Min. Number of Characters',
-        'MaxCharacters'         => 'Max. Number of Characters',
+    'MaxCharacters'         => 'Max. Number of Characters',
+    'MinCharacters'         => 'Min. Number of Characters',
+    'MinConfidence'         => 'Minimum Confidence',
+    'OnlyTargetedPlates'    => 'Detect only Targeted Plates',
+    'StrictTargeting'       => 'Strict Targeting',
+    'TargetedPlateList'     => 'Targeted List of Plates',
 );
 
 ?>
