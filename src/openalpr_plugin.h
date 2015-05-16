@@ -31,6 +31,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/program_options.hpp>
 #include <boost/program_options/option.hpp>
 #include <boost/program_options/options_description.hpp>
@@ -49,11 +50,12 @@
 #define DEFAULT_PLUGIN_LOG_PREFIX "OPENALPR PLUGIN"
 
 #define DEFAULT_ALARM_SCORE 99
-#define DEFAULT_MIN_CONFIDENCE 0
-#define DEFAULT_ADAPTIVE_CONF 0
-#define DEFAULT_MIN_CHARACTERS 0
+#define DEFAULT_ASSUME_TARGETS 0
 #define DEFAULT_MAX_CHARACTERS 99
-#define DEFAULT_EXCL_PERIOD 0
+#define DEFAULT_MIN_CHARACTERS 0
+#define DEFAULT_MIN_CONFIDENCE 0
+#define DEFAULT_ONLY_TARGETS 0
+#define DEFAULT_STRICT_TARGETS 0
 
 using namespace std;
 using namespace alpr;
@@ -101,15 +103,22 @@ private:
 
     struct pConf
     {
-        unsigned int minConfidence;
-        unsigned int minCharacters;
-        unsigned int maxCharacters;
         unsigned int alarmScore;
+        bool assumeTargets;
+        unsigned int maxCharacters;
+        unsigned int minCharacters;
+        unsigned int minConfidence;
+        bool onlyTargets;
+        bool strictTargets;
+        vector<string> targetList;
         pConf():
-            minConfidence(DEFAULT_MIN_CONFIDENCE),
-            minCharacters(DEFAULT_MIN_CHARACTERS),
+            alarmScore(DEFAULT_ALARM_SCORE),
+            assumeTargets(DEFAULT_ASSUME_TARGETS),
             maxCharacters(DEFAULT_MAX_CHARACTERS),
-            alarmScore(DEFAULT_ALARM_SCORE)
+            minCharacters(DEFAULT_MIN_CHARACTERS),
+            minConfidence(DEFAULT_MIN_CONFIDENCE),
+            onlyTargets(DEFAULT_ONLY_TARGETS),
+            strictTargets(DEFAULT_STRICT_TARGETS)
         {}
     };
 

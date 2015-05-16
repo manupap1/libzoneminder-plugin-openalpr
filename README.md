@@ -103,6 +103,10 @@ The next options are specifics to this plugin and can be used to adjust the dete
 - `Minimum Confidence` - A text box to enter the minimum confidence level. All plates with a lower confidence level will be excluded.
 - `Min. Number of Characters` - A text box to enter the minimum number of characters in a license plate. All plates with a lower number of detected characters will be excluded.
 - `Max. Number of Characters` - A text box to enter the maximum number of characters in a license plate. All plates with a greater number of detected characters will be excluded.
+- `List of Targeted Plates` - A list to specify targeted plates (detected plates will have a 100% confidence).
+- `Detect only Targeted Plates` - A yes/no select box to specify if plates not in target list shall be ignored.
+- `Strict Targeting` - A yes/no select box to specify if target matching shall be strict (plates must match exactly).
+- `Assume target matching` - When strict targeting is off plates included in wider strings are detected (within the max. number of characters limit). This yes/no select box allow to specify if such detected plates shall be considered as being equal to the target. If yes is selected, the plugin will report these plates with the target string and with a 100% confidence. If no is selected, the plugin will report these plates individually. This option can be helpfull if the plate format includes a field for a logo which may be considered as a character by openalpr.
 
 The configuration is saved to the database and applied when clicking on the `Save` button.
 

@@ -21,12 +21,13 @@
  * ****************************************************************************/
 
 $PLANG = array(
+    'AssumeTargets'         => 'Assume target matching',
     'MaxCharacters'         => 'Max. Number of Characters',
     'MinCharacters'         => 'Min. Number of Characters',
     'MinConfidence'         => 'Minimum Confidence',
-    'OnlyTargetedPlates'    => 'Detect only Targeted Plates',
-    'StrictTargeting'       => 'Strict Targeting',
-    'TargetedPlateList'     => 'Targeted List of Plates',
+    'OnlyTargets'           => 'Detect only Targeted Plates',
+    'StrictTargets'         => 'Strict Targeting',
+    'TargetList'            => 'List of Targeted Plates',
 );
 
 ?>

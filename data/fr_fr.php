@@ -21,12 +21,13 @@
  * ****************************************************************************/
 
 $PLANG = array(
+    'AssumeTargets'         => 'Supposer la correspondance',
     'MaxCharacters'         => 'Nombre max. de caractères',
     'MinCharacters'         => 'Nombre min. de caractères',
     'MinConfidence'         => 'Confiance minimum',
-    'OnlyTargetedPlates'    => 'Détecter seul. plaques ciblées',
-    'StrictTargeting'       => 'Ciblage strict',
-    'TargetedPlateList'     => 'Liste de plaques ciblées',
+    'OnlyTargets'           => 'Détecter seul. plaques ciblées',
+    'StrictTargets'         => 'Ciblage strict',
+    'TargetList'            => 'Liste de plaques ciblées',
 );
 
 ?>

@@ -117,14 +117,34 @@ int OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<stri
         // Overwrite default values with database values
         for (map<string,string>::iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
             if (it2->second.empty()) continue;
-            if (it2->first == "MinConfidence") {
-                pluginConfig[it->first].minConfidence = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
-            } else if (it2->first == "MinCharacters") {
-                pluginConfig[it->first].minCharacters = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
+            if (it2->first == "AlarmScore") {
+                pluginConfig[it->first].alarmScore = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
+            } else if (it2->first == "AssumeTargets") {
+                if (it2->second == "Yes") {
+                    pluginConfig[it->first].assumeTargets = true;
+                } else {
+                    pluginConfig[it->first].assumeTargets = false;
+                }
             } else if (it2->first == "MaxCharacters") {
                 pluginConfig[it->first].maxCharacters = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
-            } else if (it2->first == "AlarmScore") {
-                pluginConfig[it->first].alarmScore = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
+            } else if (it2->first == "MinCharacters") {
+                pluginConfig[it->first].minCharacters = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
+            } else if (it2->first == "MinConfidence") {
+                pluginConfig[it->first].minConfidence = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
+            } else if (it2->first == "OnlyTargets") {
+                if (it2->second == "Yes") {
+                    pluginConfig[it->first].onlyTargets = true;
+                } else {
+                    pluginConfig[it->first].onlyTargets = false;
+                }
+            } else if (it2->first == "StrictTargets") {
+                if (it2->second == "Yes") {
+                    pluginConfig[it->first].strictTargets = true;
+                } else {
+                    pluginConfig[it->first].strictTargets = false;
+                }
+            } else if (it2->first == "TargetList") {
+                boost::split(pluginConfig[it->first].targetList, it2->second, boost::is_any_of(","));
             }
         }
     }
@@ -300,6 +320,55 @@ bool OpenALPRPlugin::checkZone(Zone *zone, unsigned int n_zone, const Image *zmI
             detPlate.num = results.plates[i].topNPlates[k].characters;
             detPlate.conf = results.plates[i].topNPlates[k].overall_confidence;
 
+            bool isTarget = false;
+
+            // Check targeted plates first
+            for (vector<string>::iterator it = pluginConfig[n_zone].targetList.begin(); it != pluginConfig[n_zone].targetList.end(); ++it)
+            {
+                // If plates match, add targeted plate and continue with next detected plate
+                if (*it == detPlate.num)
+                {
+                    detPlate.conf = 100;
+                    addPlate(zone, n_zone, detPlate);
+                    cntDetPlates++;
+                    isTarget = true;
+                    break;
+                }
+                // Check if targeted plate is a substring of the detected plate
+                else if (detPlate.num.find(*it) != string::npos)
+                {
+                    // If yes and strict targeting is on, disqualify targeted plate
+                    if (pluginConfig[n_zone].strictTargets)
+                    {
+                        Debug(1, "%s: Zone %s - Skip targeted plate %s (strict targeting is on)", m_sLogPrefix.c_str(), zone->Label(), detPlate.num.c_str());
+                        // And continue with next targeted plate (maybe another in the list will strictly match)
+                        continue;
+                    }
+                    // If yes but detected plate has too much characters, disqualify targeted plate
+                    if (detPlate.num.size() > pluginConfig[n_zone].maxCharacters)
+                    {
+                        Debug(1, "%s: Zone %s - Skip targeted plate %s (number of characters is out of range)", m_sLogPrefix.c_str(), zone->Label(), detPlate.num.c_str());
+                        // And continue with next detected plate (this one is not valid)
+                        break;
+                    }
+                    // Overwrite detected plate by target if we assume the matching is correct
+                    if (pluginConfig[n_zone].assumeTargets)
+                    {
+                        detPlate.conf = 100;
+                        detPlate.num = *it;
+                    }
+                    // Add targeted plate to list and continue with next detected plate
+                    addPlate(zone, n_zone, detPlate);
+                    cntDetPlates++;
+                    isTarget = true;
+                    break;
+                }
+            }
+
+            // Skip detected plate if already added or if only targeted plates are accepted
+            if (isTarget || pluginConfig[n_zone].onlyTargets)
+                continue;
+
             // Disqualify plate if under the minimum confidence level
             if (detPlate.conf < pluginConfig[n_zone].minConfidence)
             {
@@ -317,7 +386,6 @@ bool OpenALPRPlugin::checkZone(Zone *zone, unsigned int n_zone, const Image *zmI
 
             // Add plate to list (if already in list, update confidence by adding new value)
             addPlate(zone, n_zone, detPlate);
-
             cntDetPlates++;
         }
 

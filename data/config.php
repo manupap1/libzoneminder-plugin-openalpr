@@ -28,7 +28,7 @@ $pluginOptions = array(
         'Value' => '0',
         'Require' => array(
             array(
-               'Name' => 'OnlyTargetedPlates',
+               'Name' => 'OnlyTargets',
                'Value' => 'No',
             ),
         ),
@@ -40,7 +40,7 @@ $pluginOptions = array(
         'Value' => '1',
         'Require' => array(
             array(
-               'Name' => 'OnlyTargetedPlates',
+               'Name' => 'OnlyTargets',
                'Value' => 'No',
             ),
         ),
@@ -52,24 +52,34 @@ $pluginOptions = array(
         'Value' => '20',
         'Require' => array(
             array(
-               'Name' => 'StrictTargeting',
+               'Name' => 'StrictTargets',
                'Value' => 'No',
             ),
         ),
     ),
-    'TargetedPlateList' => array(
+    'TargetList' => array(
         'Type' => 'list',
     ),
-    'OnlyTargetedPlates' => array(
+    'OnlyTargets' => array(
         'Type' => 'select',
         'Choices' => 'Yes,No',
         'Value'=> 'No',
     ),
-    'StrictTargeting' => array(
+    'StrictTargets' => array(
         'Type' => 'select',
         'Choices' => 'Yes,No',
         'Value'=> 'No',
+    ),
+    'AssumeTargets' => array(
+        'Type' => 'select',
+        'Choices' => 'Yes,No',
+        'Value'=> 'No',
+        'Require' => array(
+            array(
+               'Name' => 'StrictTargets',
+               'Value' => 'No',
+            ),
+        ),
     ),
 );
-
 ?>
