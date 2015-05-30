@@ -103,23 +103,23 @@ AC_CHECK_FUNCS([gethostbyname gethostname gettimeofday memmove memset mkdir munm
 AC_CHECK_FUNCS([syscall sleep usleep ioctl ioctlsocket sigaction])
 
 # Checks for libraries.
-PKG_CHECK_MODULES([LIBZMPLUGINS],
-    [libzmplugins >= 1.28],
-    [def_pkglibdir=$($PKG_CONFIG --variable=pkglibdir libzmplugins)
+PKG_CHECK_MODULES([libzoneminder],
+    [libzoneminder >= 1.28],
+    [def_pkglibdir=$($PKG_CONFIG --variable=pkglibdir libzoneminder)
      AS_IF([test "x$def_pkglibdir" = "x"],
          [AC_MSG_ERROR([Unable to find plugin library directory])],
          [AC_SUBST([pkglibdir], [$def_pkglibdir])])
-     def_sysconfdir=$($PKG_CONFIG --variable=sysconfdir libzmplugins)
+     def_sysconfdir=$($PKG_CONFIG --variable=sysconfdir libzoneminder)
      AS_IF([test "x$def_sysconfdir" = "x"],
          [AC_MSG_ERROR([Unable to find plugin configuration directory])],
          [AC_SUBST([sysconfdir], [$def_sysconfdir])])
-     def_webdir=$($PKG_CONFIG --variable=webdir libzmplugins)
+     def_webdir=$($PKG_CONFIG --variable=webdir libzoneminder)
      AS_IF([test "x$def_webdir" = "x"],
          [AC_MSG_ERROR([Unable to find plugin web directory])],
          [AC_SUBST([webdir], [$def_webdir]/$PACKAGE)])],
-    [AC_MSG_ERROR([${LIBZMPLUGINS_PKG_ERRORS}])]
+    [AC_MSG_ERROR([${LIBZONEMINDER_PKG_ERRORS}])]
 )
-AC_CHECK_LIB([zmplugins],[main],,[AC_MSG_ERROR([libzmplugins is required for plugin compilation])])
+AC_CHECK_LIB([zoneminder],[main],,[AC_MSG_ERROR([libzoneminder is required for plugin compilation])])
 PKG_CHECK_MODULES([OPENCV],[opencv >= 2.3.1],,[AC_MSG_ERROR([${OPENCV_PKG_ERRORS}])])
 AC_CHECK_LIB([opencv_core],[main],,[AC_MSG_ERROR([libopencv_core is required for plugin compilation])])
 AC_CHECK_LIB([opencv_imgproc],[main],,[AC_MSG_ERROR([libopencv_imgproc is required for plugin compilation])])
