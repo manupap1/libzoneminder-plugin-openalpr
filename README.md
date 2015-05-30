@@ -37,7 +37,7 @@ debuild
 Installation of ZoneMinder plugin development library
 ```bash
 cd ..
-sudo dpkg -i libzoneminder-plugin-dev_*_amd64.deb
+sudo dpkg -i libzoneminder-dev_*_amd64.deb
 ```
 Compilation of OpenALPR
 ```bash
