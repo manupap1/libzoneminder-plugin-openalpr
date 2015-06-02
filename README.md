@@ -125,6 +125,8 @@ Alarmed frames are highlighted with the plate's detection area(s).
 
 ![Frame](https://github.com/manupap1/libzoneminder-plugin-openalpr/blob/master/misc/frame.png)
 
+The detected plate number(s) can be added in email or sms notifications by using the %ED% token in EMAIL_BODY or MESSAGE_BODY option.
+
 ### Improvement / Contribution
 
 Feel free to contribute, if you can:
