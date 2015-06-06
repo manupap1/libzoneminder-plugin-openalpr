@@ -104,7 +104,7 @@ AC_CHECK_FUNCS([syscall sleep usleep ioctl ioctlsocket sigaction])
 
 # Checks for libraries.
 PKG_CHECK_MODULES([libzoneminder],
-    [libzoneminder >= 1.28],
+    [libzoneminder >= 1.28.1],
     [def_pkglibdir=$($PKG_CONFIG --variable=pkglibdir libzoneminder)
      AS_IF([test "x$def_pkglibdir" = "x"],
          [AC_MSG_ERROR([Unable to find plugin library directory])],
@@ -120,11 +120,9 @@ PKG_CHECK_MODULES([libzoneminder],
     [AC_MSG_ERROR([${LIBZONEMINDER_PKG_ERRORS}])]
 )
 AC_CHECK_LIB([zoneminder],[main],,[AC_MSG_ERROR([libzoneminder is required for plugin compilation])])
-PKG_CHECK_MODULES([OPENCV],[opencv >= 2.3.1],,[AC_MSG_ERROR([${OPENCV_PKG_ERRORS}])])
+PKG_CHECK_MODULES([opencv],[opencv >= 2.3.1],,[AC_MSG_ERROR([${OPENCV_PKG_ERRORS}])])
 AC_CHECK_LIB([opencv_core],[main],,[AC_MSG_ERROR([libopencv_core is required for plugin compilation])])
 AC_CHECK_LIB([opencv_imgproc],[main],,[AC_MSG_ERROR([libopencv_imgproc is required for plugin compilation])])
-AC_CHECK_LIB([opencv_highgui],[main],,[AC_MSG_ERROR([libopencv_highgui is required for plugin compilation])])
-AC_CHECK_LIB([opencv_objdetect],[main],,[AC_MSG_ERROR([libopencv_objdetect is required for plugin compilation])])
 
 AC_CHECK_LIB([boost_program_options],[main],,[AC_MSG_ERROR([libboost_program_options is required for plugin compilation])])
 
@@ -140,10 +138,9 @@ AC_CHECK_HEADERS(pthread.h,,,)
 AC_LANG_PUSH([C])
 AC_LANG_POP([C])
 
+AC_CHECK_HEADERS(alpr.h,,AC_MSG_ERROR(plugins require openalpr headers - check that development package is installed),)
 AC_CHECK_HEADERS(opencv2/core/core.hpp,,AC_MSG_ERROR(plugins require opencv core headers - check that development package is installed),)
 AC_CHECK_HEADERS(opencv2/imgproc/imgproc.hpp,,AC_MSG_ERROR(plugins require opencv imgproc headers - check that development package is installed),)
-AC_CHECK_HEADERS(opencv2/highgui/highgui.hpp,,AC_MSG_ERROR(plugins require opencv highgui headers - check that development package is installed),)
-AC_CHECK_HEADERS(opencv2/objdetect/objdetect.hpp,,AC_MSG_ERROR(plugins require opencv objdetect headers - check that development package is installed),)
 AC_CHECK_HEADERS(boost/algorithm/string.hpp,,AC_MSG_ERROR(plugins require boost string headers - check that development package is installed),)
 AC_CHECK_HEADERS(boost/program_options.hpp,,AC_MSG_ERROR(plugins require boost program_options headers - check that development package is installed),)
 
