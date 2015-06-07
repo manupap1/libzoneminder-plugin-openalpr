@@ -57,10 +57,6 @@
 #define DEFAULT_ONLY_TARGETS 0
 #define DEFAULT_STRICT_TARGETS 0
 
-using namespace std;
-using namespace alpr;
-using namespace boost::program_options;
-
 //! OpenALPR plugin class.
 /*! The class derived from Detector.
  *  This class provides license plate detection based on tesseract OCR.
@@ -72,7 +68,7 @@ class OpenALPRPlugin : public Detector {
     OpenALPRPlugin();
 
     //! Constructor.
-    OpenALPRPlugin(string sConfigSectionName);
+    OpenALPRPlugin(std::string sConfigSectionName);
 
     //! Destructor.
     virtual ~OpenALPRPlugin();
@@ -83,23 +79,23 @@ class OpenALPRPlugin : public Detector {
     //! Overloaded operator=.
     OpenALPRPlugin& operator=(const OpenALPRPlugin& source);
 
-    int loadConfig(string sConfigFileName, map<unsigned int,map<string,string> > mapPluginConf);
+    int loadConfig(std::string sConfigFileName, std::map<unsigned int,std::map<std::string,std::string> > mapPluginConf);
 
 protected:
 
     void onCreateEvent(Zone *zone, unsigned int n_zone, Event *event);
-    void onCloseEvent(Zone *zone, unsigned int n_zone, Event *event, string &noteText);
+    void onCloseEvent(Zone *zone, unsigned int n_zone, Event *event, std::string &noteText);
     bool checkZone(Zone *zone, unsigned int n_zone, const Image *zmImage);
 
-    string m_sConfigFilePath;
-    string m_sCountry;
-    string m_sRegionTemplate;
+    std::string m_sConfigFilePath;
+    std::string m_sCountry;
+    std::string m_sRegionTemplate;
     unsigned int m_nMaxPlateNumber;
     bool m_bRegionIsDet;
 
 private:
 
-    Alpr *ptrAlpr;
+    alpr::Alpr *ptrAlpr;
 
     struct pConf
     {
@@ -110,7 +106,7 @@ private:
         unsigned int minConfidence;
         bool onlyTargets;
         bool strictTargets;
-        vector<string> targetList;
+        std::vector<std::string> targetList;
         pConf():
             alarmScore(DEFAULT_ALARM_SCORE),
             assumeTargets(DEFAULT_ASSUME_TARGETS),
@@ -122,11 +118,11 @@ private:
         {}
     };
 
-    vector<pConf> pluginConfig;
+    std::vector<pConf> pluginConfig;
 
     struct strPlate
     {
-        string num;
+        std::string num;
         float conf;
     };
 
@@ -138,8 +134,8 @@ private:
         }
     };
 
-    vector<vector<strPlate> > plateList;
-    vector<vector<string> > tmpPlateList;
+    std::vector<std::vector<strPlate> > plateList;
+    std::vector<std::vector<std::string> > tmpPlateList;
 
     bool addPlate(Zone *zone, unsigned int n_zone, strPlate detPlate);
 

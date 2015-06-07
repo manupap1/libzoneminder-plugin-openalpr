@@ -20,16 +20,19 @@
 
 #include "openalpr_plugin.h"
 
+using namespace alpr;
+using namespace boost::program_options;
+
 //! Retrieve the engine version we're going to expect
 extern "C" int getEngineVersion()
 {
-  return ZM_ENGINE_VERSION;
+    return ZM_ENGINE_VERSION;
 }
 
 //! Tells us to register our functionality to an engine kernel
-extern "C" void registerPlugin(PluginManager &PlM, string sPluginName)
+extern "C" void registerPlugin(PluginManager &PlM, std::string sPluginName)
 {
-    PlM.getImageAnalyser().addDetector(auto_ptr<Detector>(new OpenALPRPlugin(sPluginName)));
+    PlM.getImageAnalyser().addDetector(std::auto_ptr<Detector>(new OpenALPRPlugin(sPluginName)));
 }
 
 OpenALPRPlugin::OpenALPRPlugin()
@@ -46,7 +49,7 @@ OpenALPRPlugin::OpenALPRPlugin()
     Info("%s: Plugin object has been created", m_sLogPrefix.c_str());
 }
 
-OpenALPRPlugin::OpenALPRPlugin(string sPluginName)
+OpenALPRPlugin::OpenALPRPlugin(std::string sPluginName)
   : Detector(sPluginName),
     m_sConfigFilePath(DEFAULT_CONFIG_FILE),
     m_sCountry(DEFAULT_COUNTRY_CODE),
@@ -60,34 +63,34 @@ OpenALPRPlugin::OpenALPRPlugin(string sPluginName)
     Info("%s: Plugin object has been created", m_sLogPrefix.c_str());
 }
 
-/*! \fn OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<string,string> > mapPluginConf)
+/*! \fn OpenALPRPlugin::loadConfig(std::string sConfigFileName, std::map<unsigned int,std::map<std::string,std::string> > mapPluginConf)
  *  \param sConfigFileName is path to configuration to load parameters from
  *  \param mapPluginConf is the map of configuration parameters for each zone
 */
-int OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<string,string> > mapPluginConf)
+int OpenALPRPlugin::loadConfig(std::string sConfigFileName, std::map<unsigned int,std::map<std::string,std::string> > mapPluginConf)
 {
     try
     {
         options_description config_file("Configuration file options.");
         variables_map vm;
         config_file.add_options()
-            ((m_sConfigSectionName + string(".config_file")).c_str(),
-                value<string>()->default_value(DEFAULT_CONFIG_FILE))
-            ((m_sConfigSectionName + string(".country_code")).c_str(),
-                value<string>()->default_value(DEFAULT_COUNTRY_CODE))
-            ((m_sConfigSectionName + string(".template_region")).c_str(),
-                value<string>()->default_value(DEFAULT_TEMPLATE_REGION))
-            ((m_sConfigSectionName + string(".topn")).c_str(),
+            ((m_sConfigSectionName + std::string(".config_file")).c_str(),
+                value<std::string>()->default_value(DEFAULT_CONFIG_FILE))
+            ((m_sConfigSectionName + std::string(".country_code")).c_str(),
+                value<std::string>()->default_value(DEFAULT_COUNTRY_CODE))
+            ((m_sConfigSectionName + std::string(".template_region")).c_str(),
+                value<std::string>()->default_value(DEFAULT_TEMPLATE_REGION))
+            ((m_sConfigSectionName + std::string(".topn")).c_str(),
                 value<int>()->default_value(DEFAULT_TOPN))
-            ((m_sConfigSectionName + string(".detect_region")).c_str(),
+            ((m_sConfigSectionName + std::string(".detect_region")).c_str(),
                 value<bool>()->default_value(DEFAULT_DETECT_REGION))
-            ((m_sConfigSectionName + string(".det_cause")).c_str(),
-                value<string>()->default_value(DEFAULT_DET_CAUSE))
-            ((m_sConfigSectionName + string(".log_prefix")).c_str(),
-                value<string>()->default_value(DEFAULT_PLUGIN_LOG_PREFIX));
+            ((m_sConfigSectionName + std::string(".det_cause")).c_str(),
+                value<std::string>()->default_value(DEFAULT_DET_CAUSE))
+            ((m_sConfigSectionName + std::string(".log_prefix")).c_str(),
+                value<std::string>()->default_value(DEFAULT_PLUGIN_LOG_PREFIX));
         try
         {
-            ifstream ifs(sConfigFileName.c_str());
+            std::ifstream ifs(sConfigFileName.c_str());
             store(parse_config_file(ifs, config_file, false), vm);
             notify(vm);
         }
@@ -96,26 +99,26 @@ int OpenALPRPlugin::loadConfig(string sConfigFileName, map<unsigned int,map<stri
             Error("%s: Plugin is not configured (%s)", m_sLogPrefix.c_str(), er.what());
             return 0;
         }
-        m_sConfigFilePath = vm[(m_sConfigSectionName + string(".config_file")).c_str()].as<string>();
-        m_sCountry = vm[(m_sConfigSectionName + string(".country_code")).c_str()].as<string>();
-        m_sRegionTemplate = vm[(m_sConfigSectionName + string(".template_region")).c_str()].as<string>();
-        m_nMaxPlateNumber = vm[(m_sConfigSectionName + string(".topn")).c_str()].as<int>();
-        m_bRegionIsDet = vm[(m_sConfigSectionName + string(".detect_region")).c_str()].as<bool>();
-        m_sDetectionCause = vm[(m_sConfigSectionName + string(".det_cause")).c_str()].as<string>();
-        m_sLogPrefix = vm[(m_sConfigSectionName + string(".log_prefix")).c_str()].as<string>();
+        m_sConfigFilePath = vm[(m_sConfigSectionName + std::string(".config_file")).c_str()].as<std::string>();
+        m_sCountry = vm[(m_sConfigSectionName + std::string(".country_code")).c_str()].as<std::string>();
+        m_sRegionTemplate = vm[(m_sConfigSectionName + std::string(".template_region")).c_str()].as<std::string>();
+        m_nMaxPlateNumber = vm[(m_sConfigSectionName + std::string(".topn")).c_str()].as<int>();
+        m_bRegionIsDet = vm[(m_sConfigSectionName + std::string(".detect_region")).c_str()].as<bool>();
+        m_sDetectionCause = vm[(m_sConfigSectionName + std::string(".det_cause")).c_str()].as<std::string>();
+        m_sLogPrefix = vm[(m_sConfigSectionName + std::string(".log_prefix")).c_str()].as<std::string>();
     }
-    catch(exception& ex)
+    catch(std::exception& ex)
     {
         Error("%s: Plugin is not configured (%s)", m_sLogPrefix.c_str(), ex.what());
         return 0;
     }
 
     pConf pluginConf;
-    for (map<unsigned int,map<string,string> >::iterator it = mapPluginConf.begin(); it != mapPluginConf.end(); ++it) {
+    for (std::map<unsigned int,std::map<std::string,std::string> >::iterator it = mapPluginConf.begin(); it != mapPluginConf.end(); ++it) {
         while ( pluginConfig.size() < (it->first + 1) )
             pluginConfig.push_back(pluginConf);
         // Overwrite default values with database values
-        for (map<string,string>::iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+        for (std::map<std::string,std::string>::iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
             if (it2->second.empty()) continue;
             if (it2->first == "AlarmScore") {
                 pluginConfig[it->first].alarmScore = (unsigned int)strtoul(it2->second.c_str(), NULL, 0);
@@ -225,13 +228,13 @@ void OpenALPRPlugin::onCreateEvent(Zone *zone, unsigned int n_zone, Event *event
 }
 
 
-/*! \fn OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event, string noteText)
+/*! \fn OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event, std::string noteText)
  *  \param zone is a pointer to the zone that triggered the event
  *  \param n_zone is the zone id
  *  \param event is a pointer to the event that will be closed
  *  \param noteText is a string that can be used to output text to the event note
  */
-void OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event, string &noteText)
+void OpenALPRPlugin::onCloseEvent(Zone *zone, unsigned int n_zone, Event *event, std::string &noteText)
 {
     // Set the number of plates to output and exit if nothing to do
     unsigned int topn = ( m_nMaxPlateNumber < plateList[n_zone].size() ) ? m_nMaxPlateNumber : plateList[n_zone].size();
@@ -323,7 +326,7 @@ bool OpenALPRPlugin::checkZone(Zone *zone, unsigned int n_zone, const Image *zmI
             bool isTarget = false;
 
             // Check targeted plates first
-            for (vector<string>::iterator it = pluginConfig[n_zone].targetList.begin(); it != pluginConfig[n_zone].targetList.end(); ++it)
+            for (std::vector<std::string>::iterator it = pluginConfig[n_zone].targetList.begin(); it != pluginConfig[n_zone].targetList.end(); ++it)
             {
                 // If plates match, add targeted plate and continue with next detected plate
                 if (*it == detPlate.num)
@@ -335,7 +338,7 @@ bool OpenALPRPlugin::checkZone(Zone *zone, unsigned int n_zone, const Image *zmI
                     break;
                 }
                 // Check if targeted plate is a substring of the detected plate
-                else if (detPlate.num.find(*it) != string::npos)
+                else if (detPlate.num.find(*it) != std::string::npos)
                 {
                     // If yes and strict targeting is on, disqualify targeted plate
                     if (pluginConfig[n_zone].strictTargets)
@@ -432,7 +435,7 @@ bool OpenALPRPlugin::checkZone(Zone *zone, unsigned int n_zone, const Image *zmI
 
 bool OpenALPRPlugin::addPlate(Zone *zone, unsigned int n_zone, strPlate detPlate)
 {
-    for (vector<strPlate>::iterator it = plateList[n_zone].begin(); it != plateList[n_zone].end(); ++it)
+    for (std::vector<strPlate>::iterator it = plateList[n_zone].begin(); it != plateList[n_zone].end(); ++it)
     {
         // If plate number exists in the list for this zone
         if ((*it).num == detPlate.num)
